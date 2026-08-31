@@ -13,7 +13,7 @@ import { ViolationsTab } from '@/components/views/teacher/tabs/violations-tab'
 import { FundTab } from '@/components/views/teacher/tabs/fund-tab'
 import { TransactionsTab } from '@/components/views/teacher/tabs/transactions-tab'
 import { ReportsTab } from '@/components/views/teacher/tabs/reports-tab'
-import { ErrorState } from '@/components/shared/ui-bits'
+import { ErrorState, LoadingBlock } from '@/components/shared/ui-bits'
 
 const TABS = [
   { key: 'overview', label: 'Tổng quan' },
@@ -58,13 +58,7 @@ export function ClassDetail({
   const [key, setKey] = useState(0) // force remount tabs after mutations when needed
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    )
+    return <LoadingBlock />
   }
   if (error || !data) {
     return <ErrorState message={(error as Error)?.message ?? 'Không tìm thấy lớp.'} onRetry={() => refetch()} />
@@ -89,7 +83,7 @@ export function ClassDetail({
             </span>
           )}
           {isManager && (
-            <span className="rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+            <span className="rounded-md bg-blue-50 border border-blue-200 px-2 py-0.5 text-xs font-semibold text-blue-700">
               Giáo viên phụ trách
             </span>
           )}
@@ -105,7 +99,7 @@ export function ClassDetail({
               className={cn(
                 'rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
                 tab === t.key
-                  ? 'bg-white text-emerald-800 shadow-sm'
+                  ? 'bg-white text-blue-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               )}
             >

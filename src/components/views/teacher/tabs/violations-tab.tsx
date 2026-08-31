@@ -110,7 +110,7 @@ export function ViolationsTab({
             className="flex items-center gap-2 text-lg font-bold tracking-tight"
             onClick={() => setCategoriesOpen((v) => !v)}
           >
-            <Tags className="h-5 w-5 text-emerald-700" />
+            <Tags className="h-5 w-5 text-blue-700" />
             Danh mục vi phạm
             {categoriesOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
           </button>

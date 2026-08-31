@@ -101,7 +101,7 @@ export function CreateStudentModal({
               <button
                 type="button"
                 onClick={() => setPassword(generatePassword())}
-                className="text-xs font-medium text-emerald-700 hover:underline"
+                className="text-xs font-medium text-blue-700 hover:underline"
               >
                 Tạo mật khẩu tự động
               </button>
@@ -120,13 +120,13 @@ export function CreateStudentModal({
               onValueChange={(v) => setClassRole(v as 'STUDENT' | 'TREASURER')}
               className="flex gap-3"
             >
-              <div className="flex flex-1 items-center space-x-2 rounded-lg border border-border px-3 py-2.5 has-[[data-state=checked]]:border-emerald-500 has-[[data-state=checked]]:bg-emerald-50/50">
+              <div className="flex flex-1 items-center space-x-2 rounded-lg border border-border px-3 py-2.5 has-[[data-state=checked]]:border-blue-500 has-[[data-state=checked]]:bg-blue-50/50">
                 <RadioGroupItem value="STUDENT" id="role-student" />
                 <Label htmlFor="role-student" className="cursor-pointer font-normal">
                   Học sinh
                 </Label>
               </div>
-              <div className="flex flex-1 items-center space-x-2 rounded-lg border border-border px-3 py-2.5 has-[[data-state=checked]]:border-emerald-500 has-[[data-state=checked]]:bg-emerald-50/50">
+              <div className="flex flex-1 items-center space-x-2 rounded-lg border border-border px-3 py-2.5 has-[[data-state=checked]]:border-blue-500 has-[[data-state=checked]]:bg-blue-50/50">
                 <RadioGroupItem value="TREASURER" id="role-treasurer" />
                 <Label htmlFor="role-treasurer" className="cursor-pointer font-normal">
                   Thủ quỹ
@@ -200,7 +200,7 @@ export function ResetPasswordModal({
               <button
                 type="button"
                 onClick={() => setNewPassword(generatePassword())}
-                className="text-xs font-medium text-emerald-700 hover:underline"
+                className="text-xs font-medium text-blue-700 hover:underline"
               >
                 Tạo tự động
               </button>

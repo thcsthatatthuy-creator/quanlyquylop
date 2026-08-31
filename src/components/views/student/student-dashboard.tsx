@@ -113,7 +113,7 @@ export function StudentDashboard({ onOpenClass }: { onOpenClass?: () => void }) 
           </div>
 
           {data!.myStats.paidTotal > 0 && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-sm text-emerald-800">
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50/60 px-4 py-3 text-sm text-blue-800">
               <BadgeCheck className="h-5 w-5 shrink-0" />
               Bạn đã nộp tổng cộng <b>{formatVND(data!.myStats.paidTotal)}</b> vào quỹ lớp (đóng quỹ +
               tiền phạt).

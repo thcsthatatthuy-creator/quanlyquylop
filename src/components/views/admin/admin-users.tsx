@@ -63,6 +63,8 @@ export function AdminUsers() {
   const [resetPassword, setResetPassword] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null)
   const [lockTarget, setLockTarget] = useState<{ user: UserRow; next: string } | null>(null)
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [createData, setCreateData] = useState({ fullName: '', email: '', password: '', systemRole: 'STUDENT' })
 
   const query = useMemo(() => {
     const p = new URLSearchParams({ page: String(page), pageSize: '15' })
@@ -116,9 +118,29 @@ export function AdminUsers() {
     onError: (e) => toast.error(e.message),
   })
 
+  const createMutation = useMutation({
+    mutationFn: (data: typeof createData) => apiFetch('/api/admin/users', { method: 'POST', json: data }),
+    onSuccess: () => {
+      toast.success('Tạo tài khoản thành công')
+      setCreateModalOpen(false)
+      setCreateData({ fullName: '', email: '', password: '', systemRole: 'STUDENT' })
+      qc.invalidateQueries({ queryKey: ['admin-users'] })
+      qc.invalidateQueries({ queryKey: ['admin-stats'] })
+    },
+    onError: (e) => toast.error(e.message),
+  })
+
   return (
     <div>
-      <PageHeader title="Người dùng" description="Quản lý toàn bộ tài khoản trong hệ thống." />
+      <PageHeader 
+        title="Người dùng" 
+        description="Quản lý toàn bộ tài khoản trong hệ thống."
+        actions={
+          <Button onClick={() => setCreateModalOpen(true)}>
+            Tạo tài khoản
+          </Button>
+        }
+      />
 
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
@@ -223,7 +245,7 @@ export function AdminUsers() {
                             {u.status === 'PENDING' ? (
                               <>
                                 <DropdownMenuItem
-                                  className="text-emerald-700"
+                                  className="text-blue-700"
                                   onClick={() =>
                                     actionMutation.mutate({ id: u.id, action: 'APPROVE' })
                                   }
@@ -317,7 +339,7 @@ export function AdminUsers() {
                 <button
                   type="button"
                   onClick={() => setResetPassword(generatePassword())}
-                  className="text-xs font-medium text-emerald-700 hover:underline"
+                  className="text-xs font-medium text-blue-700 hover:underline"
                 >
                   Tạo tự động
                 </button>
@@ -336,6 +358,77 @@ export function AdminUsers() {
               }
             >
               Đặt lại mật khẩu
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Admin create user modal */}
+      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tạo tài khoản mới</DialogTitle>
+            <DialogDescription>Tạo thủ công tài khoản Giáo viên hoặc Học sinh.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Họ và tên</Label>
+              <Input 
+                value={createData.fullName} 
+                onChange={(e) => setCreateData({ ...createData, fullName: e.target.value })} 
+                placeholder="Nguyễn Văn A" 
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Email</Label>
+              <Input 
+                type="email"
+                value={createData.email} 
+                onChange={(e) => setCreateData({ ...createData, email: e.target.value })} 
+                placeholder="email@example.com" 
+              />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label>Mật khẩu</Label>
+                <button
+                  type="button"
+                  onClick={() => setCreateData({ ...createData, password: generatePassword() })}
+                  className="text-xs font-medium text-blue-700 hover:underline"
+                >
+                  Tạo tự động
+                </button>
+              </div>
+              <Input 
+                value={createData.password} 
+                onChange={(e) => setCreateData({ ...createData, password: e.target.value })} 
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Vai trò</Label>
+              <Select
+                value={createData.systemRole}
+                onValueChange={(v) => setCreateData({ ...createData, systemRole: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="STUDENT">Học sinh</SelectItem>
+                  <SelectItem value="TEACHER">Giáo viên</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setCreateModalOpen(false)}>
+              Hủy
+            </Button>
+            <Button 
+              disabled={createMutation.isPending || !createData.fullName || !createData.email || createData.password.length < 6}
+              onClick={() => createMutation.mutate(createData)}
+            >
+              Tạo tài khoản
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -259,7 +259,7 @@ export function StudentsTab({ classId, isManager }: { classId: string; isManager
                     <TableCell className="text-muted-foreground">{(page - 1) * 10 + i + 1}</TableCell>
                     <TableCell>
                       <button
-                        className="font-medium hover:text-emerald-700 hover:underline"
+                        className="font-medium hover:text-blue-700 hover:underline"
                         onClick={() => setProfileTarget({ membershipId: s.membershipId, userId: s.userId, fullName: s.fullName })}
                       >
                         {s.fullName}

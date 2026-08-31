@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
-import type { LucideIcon } from 'lucide-react'
+import { Loader2, type LucideIcon } from 'lucide-react'
 
 export function StatCard({
   label,
@@ -22,8 +22,8 @@ export function StatCard({
 }) {
   const tones: Record<string, string> = {
     default: 'text-foreground bg-muted/50',
-    primary: 'text-emerald-700 bg-emerald-50',
-    income: 'text-emerald-700 bg-emerald-50',
+    primary: 'text-blue-700 bg-blue-50',
+    income: 'text-blue-700 bg-blue-50',
     expense: 'text-red-700 bg-red-50',
     warning: 'text-amber-700 bg-amber-50',
   }
@@ -34,7 +34,9 @@ export function StatCard({
           <div className="min-w-0">
             <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
             {loading ? (
-              <Skeleton className="mt-2 h-7 w-28" />
+              <div className="mt-2 h-7 flex items-center">
+                <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+              </div>
             ) : (
               <p className="mt-1 truncate text-xl sm:text-2xl font-bold tracking-tight tabular-nums">
                 {value}
@@ -96,10 +98,8 @@ export function EmptyState({
 
 export function LoadingBlock({ className }: { className?: string }) {
   return (
-    <div className={cn('space-y-3', className)}>
-      <Skeleton className="h-20 w-full rounded-xl" />
-      <Skeleton className="h-20 w-full rounded-xl" />
-      <Skeleton className="h-20 w-full rounded-xl" />
+    <div className={cn('flex items-center justify-center py-12', className)}>
+      <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
     </div>
   )
 }

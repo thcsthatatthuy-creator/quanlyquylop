@@ -141,11 +141,11 @@ export function ImportStudentsModal({
           <div className="space-y-4">
             <label
               className={cn(
-                'flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/20 px-6 py-10 text-center transition-colors hover:border-emerald-400 hover:bg-emerald-50/30',
+                'flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/20 px-6 py-10 text-center transition-colors hover:border-blue-400 hover:bg-blue-50/30',
                 (parsing || validating) && 'pointer-events-none opacity-60'
               )}
             >
-              <FileSpreadsheet className="h-8 w-8 text-emerald-600" />
+              <FileSpreadsheet className="h-8 w-8 text-blue-600" />
               <p className="mt-2 text-sm font-medium">
                 {parsing ? 'Đang đọc file...' : validating ? 'Đang kiểm tra dữ liệu...' : 'Nhấn để chọn file Excel (.xlsx, .xls, .csv)'}
               </p>
@@ -169,9 +169,9 @@ export function ImportStudentsModal({
                 <p className="text-lg font-bold">{summary?.totalRows}</p>
                 <p className="text-xs text-muted-foreground">Tổng dòng</p>
               </div>
-              <div className="rounded-lg bg-emerald-50 px-3 py-2">
-                <p className="text-lg font-bold text-emerald-700">{summary?.validCount}</p>
-                <p className="text-xs text-emerald-700">Dòng hợp lệ</p>
+              <div className="rounded-lg bg-blue-50 px-3 py-2">
+                <p className="text-lg font-bold text-blue-700">{summary?.validCount}</p>
+                <p className="text-xs text-blue-700">Dòng hợp lệ</p>
               </div>
               <div className="rounded-lg bg-red-50 px-3 py-2">
                 <p className="text-lg font-bold text-red-700">{summary?.invalidCount}</p>
@@ -199,7 +199,7 @@ export function ImportStudentsModal({
                       <td className="px-2 py-1.5">{r.classRole === 'TREASURER' ? 'Thủ quỹ' : 'Học sinh'}</td>
                       <td className="px-2 py-1.5">
                         {r.valid ? (
-                          <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
+                          <span className="inline-flex items-center gap-1 font-medium text-blue-700">
                             <CircleCheck className="h-3.5 w-3.5" /> Hợp lệ
                           </span>
                         ) : (

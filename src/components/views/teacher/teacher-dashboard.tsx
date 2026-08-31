@@ -110,11 +110,11 @@ export function TeacherDashboard() {
           {classes.map((c) => (
             <div
               key={c.id}
-              className="group cursor-pointer rounded-xl border border-border bg-white p-5 shadow-sm transition-all hover:border-emerald-300 hover:shadow-md"
+              className="group cursor-pointer rounded-xl border border-border bg-white p-5 shadow-sm transition-all hover:border-blue-300 hover:shadow-md"
               onClick={() => (window.location.hash = `/classes/${c.id}`)}
             >
               <div className="flex items-start justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-lg font-bold text-emerald-700">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-lg font-bold text-blue-700">
                   {c.name.replace(/[^0-9A-Za-zÀ-ỹ]/g, '').slice(0, 2).toUpperCase()}
                 </div>
                 <DropdownMenu>
@@ -155,14 +155,14 @@ export function TeacherDashboard() {
                   variant="outline"
                   className={
                     c.balance >= 0
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      ? 'border-blue-200 bg-blue-50 text-blue-700'
                       : 'border-red-200 bg-red-50 text-red-700'
                   }
                 >
                   {formatVNDShort(c.balance)}
                 </Badge>
               </div>
-              <div className="mt-2 flex items-center gap-1 text-xs font-medium text-emerald-700 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="mt-2 flex items-center gap-1 text-xs font-medium text-blue-700 opacity-0 transition-opacity group-hover:opacity-100">
                 Mở quản lý lớp <ArrowUpRight className="h-3.5 w-3.5" />
               </div>
             </div>

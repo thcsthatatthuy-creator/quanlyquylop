@@ -11,7 +11,7 @@ import {
 import { apiFetch } from '@/lib/client'
 import { formatVND, formatDate, formatDateTime } from '@/lib/format'
 import { RoleBadge, StatusBadge } from '@/components/shared/badges'
-import { Skeleton } from '@/components/ui/skeleton'
+import { LoadingBlock } from '@/components/shared/ui-bits'
 import { Separator } from '@/components/ui/separator'
 import { AlertTriangle, Inbox } from 'lucide-react'
 
@@ -61,10 +61,7 @@ export function StudentProfileModal({
         </DialogHeader>
 
         {isLoading || !data ? (
-          <div className="space-y-3">
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-24 w-full" />
-          </div>
+          <LoadingBlock />
         ) : (
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-muted/30 p-4">
@@ -86,9 +83,9 @@ export function StudentProfileModal({
                   <p className="text-[11px] font-medium text-amber-700">Số lần vi phạm</p>
                   <p className="text-base font-bold text-amber-800">{data.student.violationCount}</p>
                 </div>
-                <div className="rounded-lg bg-emerald-50 px-3 py-2">
-                  <p className="text-[11px] font-medium text-emerald-700">Tổng tiền đã nộp</p>
-                  <p className="text-base font-bold text-emerald-800">
+                <div className="rounded-lg bg-blue-50 px-3 py-2">
+                  <p className="text-[11px] font-medium text-blue-700">Tổng tiền đã nộp</p>
+                  <p className="text-base font-bold text-blue-800">
                     {formatVND(data.student.paidTotal ?? 0)}
                   </p>
                 </div>

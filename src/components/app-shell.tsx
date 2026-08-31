@@ -7,7 +7,7 @@ import { LoginView, RegisterView } from '@/components/views/auth/auth-views'
 import { TeacherLayout } from '@/components/views/teacher/teacher-layout'
 import { StudentLayout } from '@/components/views/student/student-layout'
 import { AdminLayout } from '@/components/views/admin/admin-layout'
-import { Wallet } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 function subscribeHash(cb: () => void) {
   window.addEventListener('hashchange', cb)
@@ -26,10 +26,12 @@ function getServerSnapshot(): string {
 function Splash() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600">
-        <Wallet className="h-7 w-7 animate-pulse text-white" />
+      <div className="flex h-24 w-56 items-center justify-center overflow-hidden">
+        <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
       </div>
-      <p className="text-sm text-muted-foreground">Đang tải Quỹ Lớp...</p>
+      <div className="mt-4 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
     </div>
   )
 }

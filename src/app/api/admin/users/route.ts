@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { requireRole } from '@/lib/permissions'
-import { handle, ok } from '@/lib/api'
+import { handle, ok, error } from '@/lib/api'
+import { hashPassword } from '@/lib/auth'
 
 /**
  * GET /api/admin/users — danh sách toàn bộ người dùng (admin)
@@ -69,5 +70,47 @@ export async function GET(req: NextRequest) {
     const paged = rows.slice((page - 1) * pageSize, page * pageSize)
 
     return ok({ users: paged, total: totalFiltered, page, totalPages })
+  })
+}
+
+export async function POST(req: NextRequest) {
+  return handle(async () => {
+    await requireRole('ADMIN')
+    const body = await req.json()
+    const { email, password, fullName, systemRole } = body
+
+    if (!email || !password || !fullName || !systemRole) {
+      return error(400, 'Thiếu thông tin bắt buộc')
+    }
+    
+    if (systemRole !== 'TEACHER' && systemRole !== 'STUDENT') {
+      return error(400, 'Vai trò không hợp lệ')
+    }
+
+    const exists = await db.user.findUnique({ where: { email } })
+    if (exists) {
+      return error(400, 'Email đã được sử dụng')
+    }
+
+    const hashed = await hashPassword(password)
+    const user = await db.user.create({
+      data: {
+        email,
+        passwordHash: hashed,
+        fullName,
+        systemRole,
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        systemRole: true,
+        status: true,
+        createdAt: true,
+      },
+    })
+
+    return ok({ user })
   })
 }

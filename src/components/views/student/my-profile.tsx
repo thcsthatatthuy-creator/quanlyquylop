@@ -48,7 +48,7 @@ export function MyProfile() {
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-800">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-800">
                 {data!.profile.fullName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -102,9 +102,9 @@ export function MyProfile() {
                 <p className="text-xs font-medium text-amber-700">Số lần vi phạm</p>
                 <p className="mt-0.5 text-lg font-bold text-amber-800">{data!.myStats.violationCount}</p>
               </div>
-              <div className="rounded-lg bg-emerald-50 px-3.5 py-3">
-                <p className="text-xs font-medium text-emerald-700">Tổng tiền đã nộp</p>
-                <p className="mt-0.5 text-lg font-bold text-emerald-800">
+              <div className="rounded-lg bg-blue-50 px-3.5 py-3">
+                <p className="text-xs font-medium text-blue-700">Tổng tiền đã nộp</p>
+                <p className="mt-0.5 text-lg font-bold text-blue-800">
                   {formatVND(data!.myStats.paidTotal)}
                 </p>
               </div>
@@ -118,7 +118,7 @@ export function MyProfile() {
             <Separator className="my-4" />
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Số dư quỹ lớp</span>
-              <span className="font-semibold text-emerald-700">
+              <span className="font-semibold text-blue-700">
                 {formatVND(data!.classFund?.balance ?? 0)}
               </span>
             </div>

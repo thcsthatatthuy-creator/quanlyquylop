@@ -23,13 +23,9 @@ export function isActive(path: string, itemPath: string): boolean {
 
 function Brand() {
   return (
-    <div className="flex items-center gap-2.5 px-5 py-4">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600">
-        <Wallet className="h-5 w-5 text-white" />
-      </div>
-      <div className="min-w-0">
-        <p className="text-[15px] font-bold leading-tight">Quỹ Lớp</p>
-        <p className="truncate text-[11px] text-muted-foreground">Quản lý quỹ lớp học</p>
+    <div className="flex items-center justify-center px-5 py-4">
+      <div className="flex h-12 w-32 shrink-0 items-center justify-center overflow-hidden">
+        <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
       </div>
     </div>
   )
@@ -58,11 +54,11 @@ function NavLinks({
             className={cn(
               'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
               active
-                ? 'bg-emerald-50 text-emerald-800'
+                ? 'bg-blue-50 text-blue-800'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
             )}
           >
-            <item.icon className={cn('h-[18px] w-[18px] shrink-0', active && 'text-emerald-700')} />
+            <item.icon className={cn('h-[18px] w-[18px] shrink-0', active && 'text-blue-700')} />
             <span className="truncate">{item.label}</span>
             {typeof item.badge === 'number' && item.badge > 0 && (
               <span className="ml-auto rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800">
@@ -81,7 +77,7 @@ function UserBox() {
   return (
     <div className="border-t border-border px-3 py-3">
       <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-800">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-800">
           {auth.user?.fullName?.charAt(0)?.toUpperCase() ?? '?'}
         </div>
         <div className="min-w-0 flex-1">
@@ -112,12 +108,12 @@ function BottomNav({ navItems, path }: { navItems: NavItem[]; path: string }) {
             onClick={() => navigate(item.path)}
             className={cn(
               'relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium',
-              active ? 'text-emerald-700' : 'text-slate-500'
+              active ? 'text-blue-700' : 'text-slate-500'
             )}
           >
-            <item.icon className={cn('h-5 w-5', active && 'text-emerald-700')} />
+            <item.icon className={cn('h-5 w-5', active && 'text-blue-700')} />
             <span className="max-w-full truncate">{item.label}</span>
-            {active && <span className="absolute top-0 h-0.5 w-10 rounded-full bg-emerald-600" />}
+            {active && <span className="absolute top-0 h-0.5 w-10 rounded-full bg-blue-600" />}
             {typeof item.badge === 'number' && item.badge > 0 && (
               <span className="absolute right-[18%] top-1 rounded-full bg-amber-100 px-1.5 text-[9px] font-bold text-amber-800">
                 {item.badge}
@@ -183,11 +179,10 @@ export function AppFrame({
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-600">
-              <Wallet className="h-4 w-4 text-white" />
+          <div className="flex items-center justify-center">
+            <div className="flex h-9 w-28 items-center justify-center overflow-hidden">
+              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
             </div>
-            <span className="font-bold">Quỹ Lớp</span>
           </div>
           <button
             onClick={auth.logout}

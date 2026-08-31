@@ -35,16 +35,12 @@ export function LoginView({ onSuccess }: { onSuccess: (u: AuthUser) => void }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-emerald-50/60 to-background px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-50/60 to-background px-4 py-10">
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/20">
-            <Wallet className="h-7 w-7 text-white" />
+          <div className="mb-4 flex h-24 w-56 items-center justify-center overflow-hidden">
+            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight">Quỹ Lớp</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Đăng nhập để quản lý quỹ, vi phạm và học sinh
-          </p>
         </div>
 
         <Card className="shadow-md border-border/70">
@@ -87,7 +83,7 @@ export function LoginView({ onSuccess }: { onSuccess: (u: AuthUser) => void }) {
               Chưa có tài khoản?{' '}
               <button
                 onClick={() => navigate('/register')}
-                className="font-semibold text-emerald-700 hover:underline"
+                className="font-semibold text-blue-700 hover:underline"
               >
                 Đăng ký ngay
               </button>
@@ -95,13 +91,6 @@ export function LoginView({ onSuccess }: { onSuccess: (u: AuthUser) => void }) {
           </CardContent>
         </Card>
 
-        <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-xs text-emerald-900">
-          <p className="font-semibold">Tài khoản quản trị mặc định:</p>
-          <p className="mt-0.5">
-            Email: <span className="font-mono">admin@lopfund.vn</span> — Mật khẩu:{' '}
-            <span className="font-mono">admin123</span>
-          </p>
-        </div>
       </div>
     </div>
   )
@@ -138,16 +127,12 @@ export function RegisterView({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-emerald-50/60 to-background px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-50/60 to-background px-4 py-10">
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/20">
-            <Wallet className="h-7 w-7 text-white" />
+          <div className="mb-4 flex h-24 w-56 items-center justify-center overflow-hidden">
+            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight">Tạo tài khoản</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Học sinh đăng ký xong chờ giáo viên thêm vào lớp
-          </p>
         </div>
 
         <Card className="shadow-md border-border/70">
@@ -205,13 +190,13 @@ export function RegisterView({ onSuccess }: { onSuccess: () => void }) {
                   onValueChange={(v) => setAccountType(v as 'STUDENT' | 'TEACHER')}
                   className="flex gap-4"
                 >
-                  <div className="flex items-center space-x-2 rounded-lg border border-border px-3 py-2 has-[[data-state=checked]]:border-emerald-500 has-[[data-state=checked]]:bg-emerald-50/50">
+                  <div className="flex items-center space-x-2 rounded-lg border border-border px-3 py-2 has-[[data-state=checked]]:border-blue-500 has-[[data-state=checked]]:bg-blue-50/50">
                     <RadioGroupItem value="STUDENT" id="acc-student" />
                     <Label htmlFor="acc-student" className="cursor-pointer font-normal">
                       Học sinh
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 rounded-lg border border-border px-3 py-2 has-[[data-state=checked]]:border-emerald-500 has-[[data-state=checked]]:bg-emerald-50/50">
+                  <div className="flex items-center space-x-2 rounded-lg border border-border px-3 py-2 has-[[data-state=checked]]:border-blue-500 has-[[data-state=checked]]:bg-blue-50/50">
                     <RadioGroupItem value="TEACHER" id="acc-teacher" />
                     <Label htmlFor="acc-teacher" className="cursor-pointer font-normal">
                       Giáo viên
@@ -234,7 +219,7 @@ export function RegisterView({ onSuccess }: { onSuccess: () => void }) {
               Đã có tài khoản?{' '}
               <button
                 onClick={() => navigate('/login')}
-                className="font-semibold text-emerald-700 hover:underline"
+                className="font-semibold text-blue-700 hover:underline"
               >
                 Đăng nhập
               </button>

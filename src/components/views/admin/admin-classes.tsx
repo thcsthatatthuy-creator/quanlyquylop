@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '@/lib/client'
+import { apiFetch, navigate } from '@/lib/client'
 import { PageHeader, EmptyState, LoadingBlock } from '@/components/shared/ui-bits'
 import { formatVNDShort, formatDate } from '@/lib/format'
 import { Badge } from '@/components/ui/badge'
@@ -52,14 +52,14 @@ export function AdminClasses() {
           {data!.classes.map((c) => (
             <div key={c.id} className="rounded-xl border border-border bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-lg font-bold text-emerald-700">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-lg font-bold text-blue-700">
                   {c.name.slice(0, 2).toUpperCase()}
                 </div>
                 <Badge
                   variant="outline"
                   className={
                     c.balance >= 0
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      ? 'border-blue-200 bg-blue-50 text-blue-700'
                       : 'border-red-200 bg-red-50 text-red-700'
                   }
                 >
@@ -77,6 +77,11 @@ export function AdminClasses() {
                 <span>{c._count.transactions} giao dịch</span>
               </div>
               <p className="mt-2 text-[11px] text-muted-foreground">Tạo ngày {formatDate(c.createdAt)}</p>
+              <div className="mt-4 pt-4 border-t border-border">
+                <Button variant="outline" className="w-full text-blue-700 hover:text-blue-800" onClick={() => navigate(`/admin/classes/${c.id}`)}>
+                  Vào lớp
+                </Button>
+              </div>
             </div>
           ))}
         </div>

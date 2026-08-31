@@ -42,7 +42,7 @@ export function ReportsTab({ classId, isManager }: { classId: string; isManager:
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
-              <TrendingUp className="h-4.5 w-4.5 text-emerald-700" /> Dòng tiền 6 tháng
+              <TrendingUp className="h-4.5 w-4.5 text-blue-700" /> Dòng tiền 6 tháng
             </CardTitle>
             <CardDescription>Tuần tự thu — chi — tiền phạt theo tháng</CardDescription>
           </CardHeader>
@@ -60,7 +60,7 @@ export function ReportsTab({ classId, isManager }: { classId: string; isManager:
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
-              <PieChart className="h-4.5 w-4.5 text-emerald-700" /> Cơ cấu chi tiêu
+              <PieChart className="h-4.5 w-4.5 text-blue-700" /> Cơ cấu chi tiêu
             </CardTitle>
             <CardDescription>Tỉ trọng các danh mục chi</CardDescription>
           </CardHeader>
@@ -79,7 +79,7 @@ export function ReportsTab({ classId, isManager }: { classId: string; isManager:
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
-            <BarChart3 className="h-4.5 w-4.5 text-emerald-700" /> Thống kê vi phạm theo loại
+            <BarChart3 className="h-4.5 w-4.5 text-blue-700" /> Thống kê vi phạm theo loại
           </CardTitle>
           <CardDescription>Số lần vi phạm của cả lớp theo từng danh mục</CardDescription>
         </CardHeader>

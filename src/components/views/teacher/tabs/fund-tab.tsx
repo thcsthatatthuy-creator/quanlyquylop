@@ -108,8 +108,8 @@ export function FundTab({ classId, isManager }: { classId: string; isManager: bo
                 className={cn(
                   'rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
                   filter === f.key
-                    ? 'border-emerald-600 bg-emerald-600 text-white'
-                    : 'border-border bg-white text-slate-600 hover:border-emerald-300'
+                    ? 'border-blue-600 bg-blue-600 text-white'
+                    : 'border-border bg-white text-slate-600 hover:border-blue-300'
                 )}
               >
                 {f.label}
@@ -162,7 +162,7 @@ export function FundTab({ classId, isManager }: { classId: string; isManager: bo
                 <div
                   className={cn(
                     'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
-                    tx.type === 'INCOME' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                    tx.type === 'INCOME' ? 'bg-blue-50 text-blue-700' : 'bg-red-50 text-red-700'
                   )}
                 >
                   {tx.type === 'INCOME' ? (

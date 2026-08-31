@@ -7,6 +7,7 @@ import { AdminDashboard } from '@/components/views/admin/admin-dashboard'
 import { AdminUsers } from '@/components/views/admin/admin-users'
 import { AdminApprovals } from '@/components/views/admin/admin-approvals'
 import { AdminClasses } from '@/components/views/admin/admin-classes'
+import { ClassDetail } from '@/components/views/teacher/class-detail'
 import { AuditView } from '@/components/views/shared/audit-view'
 import { LayoutDashboard, Users, UserCheck, School, History } from 'lucide-react'
 
@@ -25,9 +26,25 @@ export function AdminLayout({ path }: { path: string }) {
     { label: 'Audit Log', icon: History, path: '/admin/audit' },
   ]
 
+  const classDetailMatch = path.match(/^\/admin\/classes\/([^/]+)(?:\/([^/]+))?$/)
+
   let content: React.ReactNode
   if (path.startsWith('/admin/users')) content = <AdminUsers />
   else if (path.startsWith('/admin/approvals')) content = <AdminApprovals />
+  else if (classDetailMatch) {
+    content = (
+      <ClassDetail
+        classId={classDetailMatch[1]}
+        tab={classDetailMatch[2] ?? 'overview'}
+        onTab={(t) => {
+          window.location.hash = `/admin/classes/${classDetailMatch![1]}/${t}`
+        }}
+        onBack={() => {
+          window.location.hash = '/admin/classes'
+        }}
+      />
+    )
+  }
   else if (path.startsWith('/admin/classes')) content = <AdminClasses />
   else if (path.startsWith('/admin/audit')) content = <AuditView variant="admin" />
   else content = <AdminDashboard />
