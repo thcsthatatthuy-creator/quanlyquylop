@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { requireRole } from '@/lib/permissions'
-import { handle, ok, error } from '@/lib/api'
+import { handle, ok, fail } from '@/lib/api'
 import { hashPassword } from '@/lib/auth'
 
 /**
@@ -80,16 +80,16 @@ export async function POST(req: NextRequest) {
     const { email, password, fullName, systemRole } = body
 
     if (!email || !password || !fullName || !systemRole) {
-      return error(400, 'Thiếu thông tin bắt buộc')
+      return fail(400, 'Thiếu thông tin bắt buộc')
     }
     
     if (systemRole !== 'TEACHER' && systemRole !== 'STUDENT') {
-      return error(400, 'Vai trò không hợp lệ')
+      return fail(400, 'Vai trò không hợp lệ')
     }
 
     const exists = await db.user.findUnique({ where: { email } })
     if (exists) {
-      return error(400, 'Email đã được sử dụng')
+      return fail(400, 'Email đã được sử dụng')
     }
 
     const hashed = await hashPassword(password)
