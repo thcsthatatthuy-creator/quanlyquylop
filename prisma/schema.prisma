@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:/home/z/my-project/db/custom.db"
+}
+
+// ============================================================
+// USERS - Tài khoản toàn hệ thống
+// systemRole: ADMIN | TEACHER | STUDENT
+// status:     ACTIVE | PENDING | SUSPENDED
+// ============================================================
+model User {
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String   @unique
+  passwordHash String
+  systemRole   String   @default("STUDENT")
+  status       String   @default("ACTIVE")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  taughtClasses        Class[]           @relation("TeacherClasses")
+  memberships          ClassMember[]
+  violations           Violation[]       @relation("StudentViolations")
+  transactions         FundTransaction[] @relation("StudentTransactions")
+  createdViolations    Violation[]       @relation("ViolationCreator")
+  createdTransactions  FundTransaction[] @relation("TransactionCreator")
+  activityLogs         ActivityLog[]
+}
+
+// ============================================================
+// CLASSES - Lớp học do giáo viên tạo
+// ============================================================
+model Class {
+  id          String   @id @default(cuid())
+  name        String
+  schoolYear  String
+  description String?
+  teacherId   String
+  teacher     User     @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members        ClassMember[]
+  violationTypes ViolationType[]
+  violations     Violation[]
+  transactions   FundTransaction[]
+}
+
+// ============================================================
+// CLASS MEMBERS - Thành viên lớp + role trong lớp
+// classRole: STUDENT | TREASURER (thủ quỹ là class role, không phải system role)
+// ============================================================
+model ClassMember {
+  id        String   @id @default(cuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classRole String   @default("STUDENT")
+  createdAt DateTime @default(now())
+
+  @@unique([classId, userId])
+}
+
+// ============================================================
+// VIOLATION TYPES - Danh mục vi phạm của từng lớp
+// ============================================================
+model ViolationType {
+  id        String   @id @default(cuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name      String
+  amount    Int
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  violations Violation[]
+}
+
+// ============================================================
+// VIOLATIONS - Vi phạm ghi nhận (tiền phạt CHƯA vào quỹ cho tới khi có giao dịch thu)
+// ============================================================
+model Violation {
+  id              String        @id @default(cuid())
+  classId         String
+  class           Class         @relation(fields: [classId], references: [id], onDelete: Cascade)
+  studentId       String
+  student         User          @relation("StudentViolations", fields: [studentId], references: [id], onDelete: Cascade)
+  violationTypeId String
+  violationType   ViolationType @relation(fields: [violationTypeId], references: [id])
+  amount          Int
+  note            String?
+  createdBy       String
+  creator         User          @relation("ViolationCreator", fields: [createdBy], references: [id])
+  createdAt       DateTime      @default(now())
+}
+
+// ============================================================
+// FUND TRANSACTIONS - Sổ quỹ (thu / chi)
+// type:     INCOME | EXPENSE
+// category: FUND_CONTRIBUTION | PENALTY_PAYMENT | OTHER_INCOME
+//           SUPPLIES | ACTIVITY | DECORATION | OTHER_EXPENSE
+// ============================================================
+model FundTransaction {
+  id          String   @id @default(cuid())
+  classId     String
+  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  type        String
+  category    String
+  amount      Int
+  studentId   String?
+  student     User?    @relation("StudentTransactions", fields: [studentId], references: [id], onDelete: SetNull)
+  description String
+  note        String?
+  createdBy   String
+  creator     User     @relation("TransactionCreator", fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+// ============================================================
+// ACTIVITY LOGS - Audit log (ai làm gì, với ai, khi nào)
+// ============================================================
+model ActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String
+  targetType String
+  targetId   String?
+  classId    String?
+  metadata   String?
+  createdAt  DateTime @default(now())
+}
