@@ -41,8 +41,18 @@ export async function GET() {
         where: { classId: membership.classId },
         _sum: { amount: true },
       })
-      classIncome = agg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
+      const penaltyAgg = await db.fundTransaction.aggregate({
+        where: { classId: membership.classId, type: 'INCOME', category: 'PENALTY_PAYMENT' },
+        _sum: { amount: true },
+      })
+      const violationAggAll = await db.violation.aggregate({
+        where: { classId: membership.classId },
+        _sum: { amount: true },
+      })
+      
+      const rawIncome = agg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
       classExpense = agg.find((a) => a.type === 'EXPENSE')?._sum.amount ?? 0
+      classIncome = rawIncome - (penaltyAgg._sum.amount ?? 0) + (violationAggAll._sum.amount ?? 0)
       classBalance = classIncome - classExpense
       classMemberCount = await db.classMember.count({ where: { classId: membership.classId } })
     }
@@ -63,6 +73,7 @@ export async function GET() {
       profile: {
         fullName: user.fullName,
         email: user.email,
+        avatar: user.avatar,
       },
       classInfo: membership
         ? {
@@ -79,8 +90,7 @@ export async function GET() {
         violationTotal: violationAgg._sum.amount ?? 0,
         violationCount: violationAgg._count,
         paidTotal: paidAgg._sum.amount ?? 0,
-        remainingToPay:
-          Math.max(0, (violationAgg._sum.amount ?? 0) - (paidAgg._sum.amount ?? 0)),
+        remainingToPay: 0, // No longer required to manually pay penalties
       },
       classFund: membership ? { balance: classBalance, income: classIncome, expense: classExpense } : null,
       recentViolations,

@@ -33,6 +33,7 @@ export function CreateStudentModal({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [classRole, setClassRole] = useState<'STUDENT' | 'TREASURER'>('STUDENT')
+  const [gender, setGender] = useState<'male' | 'female'>('male')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -53,9 +54,14 @@ export function CreateStudentModal({
     try {
       await apiFetch(`/api/classes/${classId}/students`, {
         method: 'POST',
-        json: { fullName: fullName.trim(), email: email.trim(), password, classRole },
+        json: { fullName, email, password, classRole, gender },
       })
-      toast.success(`Đã tạo tài khoản cho ${fullName.trim()}.`)
+      toast.success('Tạo tài khoản thành công!')
+      setFullName('')
+      setEmail('')
+      setPassword('')
+      setClassRole('STUDENT')
+      setGender('male')
       onCreated()
       onClose()
     } catch (err) {
@@ -112,6 +118,27 @@ export function CreateStudentModal({
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Tối thiểu 6 ký tự"
             />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Giới tính</Label>
+            <RadioGroup
+              value={gender}
+              onValueChange={(v) => setGender(v as 'male' | 'female')}
+              className="flex gap-3"
+            >
+              <div className="flex flex-1 items-center space-x-2 rounded-lg border border-border px-3 py-2.5 has-[[data-state=checked]]:border-blue-500 has-[[data-state=checked]]:bg-blue-50/50">
+                <RadioGroupItem value="male" id="gender-male" />
+                <Label htmlFor="gender-male" className="cursor-pointer font-normal">
+                  Nam
+                </Label>
+              </div>
+              <div className="flex flex-1 items-center space-x-2 rounded-lg border border-border px-3 py-2.5 has-[[data-state=checked]]:border-blue-500 has-[[data-state=checked]]:bg-blue-50/50">
+                <RadioGroupItem value="female" id="gender-female" />
+                <Label htmlFor="gender-female" className="cursor-pointer font-normal">
+                  Nữ
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
           <div className="space-y-1.5">
             <Label>Vai trò trong lớp</Label>

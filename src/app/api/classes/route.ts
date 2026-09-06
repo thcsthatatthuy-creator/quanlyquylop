@@ -34,8 +34,21 @@ export async function GET() {
           where: { classId: c.id },
           _sum: { amount: true },
         })
-        const income = agg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
+        const penaltyAgg = await db.fundTransaction.aggregate({
+          where: { classId: c.id, type: 'INCOME', category: 'PENALTY_PAYMENT' },
+          _sum: { amount: true },
+        })
+        const violationAgg = await db.violation.aggregate({
+          where: { classId: c.id },
+          _sum: { amount: true },
+        })
+        
+        const rawIncome = agg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
         const expense = agg.find((a) => a.type === 'EXPENSE')?._sum.amount ?? 0
+        const penaltyIncome = penaltyAgg._sum.amount ?? 0
+        const violationTotal = violationAgg._sum.amount ?? 0
+        
+        const income = rawIncome - penaltyIncome + violationTotal
         return { ...c, balance: income - expense }
       })
     )

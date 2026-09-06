@@ -25,8 +25,7 @@ interface TxRow {
 
 const FILTERS = [
   { key: 'all', label: 'Tất cả' },
-  { key: 'INCOME', label: 'Thu' },
-  { key: 'EXPENSE', label: 'Chi' },
+  { key: 'INCOME', label: 'Đóng quỹ & Thu khác' },
   { key: 'PENALTY_PAYMENT', label: 'Tiền phạt' },
 ]
 
@@ -37,7 +36,7 @@ export function FundTab({ classId, isManager }: { classId: string; isManager: bo
   const [page, setPage] = useState(1)
 
   const statsQuery = useQuery<{
-    stats: { balance: number; totalIncome: number; totalExpense: number; penaltyCollected: number }
+    stats: { balance: number; totalIncome: number; penaltyCollected: number }
   }>({
     queryKey: ['class-stats', classId],
     queryFn: () => apiFetch(`/api/classes/${classId}/stats`),
@@ -46,7 +45,11 @@ export function FundTab({ classId, isManager }: { classId: string; isManager: bo
 
   const query = useMemo(() => {
     const p = new URLSearchParams({ page: String(page), pageSize: '30' })
-    if (filter !== 'all') p.set('type', filter)
+    if (filter === 'PENALTY_PAYMENT') {
+      p.set('category', 'PENALTY_PAYMENT')
+    } else if (filter !== 'all') {
+      p.set('type', filter)
+    }
     if (from) p.set('from', from)
     if (to) p.set('to', to)
     return p.toString()
@@ -62,9 +65,9 @@ export function FundTab({ classId, isManager }: { classId: string; isManager: bo
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
         <StatCard
-          label="Số dư quỹ"
+          label="Tổng quỹ (Số dư)"
           value={s ? formatVND(s.balance) : '—'}
           icon={Wallet}
           tone="primary"
@@ -75,13 +78,6 @@ export function FundTab({ classId, isManager }: { classId: string; isManager: bo
           value={s ? formatVND(s.totalIncome) : '—'}
           icon={ArrowDownToLine}
           tone="income"
-          loading={statsQuery.isLoading}
-        />
-        <StatCard
-          label="Tổng chi"
-          value={s ? formatVND(s.totalExpense) : '—'}
-          icon={ArrowUpFromLine}
-          tone="expense"
           loading={statsQuery.isLoading}
         />
         <StatCard

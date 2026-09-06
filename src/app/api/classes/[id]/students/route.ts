@@ -31,7 +31,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       where,
       include: {
         user: {
-          select: { id: true, fullName: true, email: true, status: true, createdAt: true },
+          select: { id: true, fullName: true, email: true, status: true, avatar: true, createdAt: true },
         },
       },
     })
@@ -52,6 +52,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         userId: m.user.id,
         fullName: m.user.fullName,
         email: m.user.email,
+        avatar: m.user.avatar,
         status: m.user.status,
         classRole: m.classRole,
         joinedAt: m.createdAt,
@@ -100,6 +101,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const email = requireString(body.email, 'Email', 200).toLowerCase()
     const password = typeof body.password === 'string' ? body.password : ''
     const classRole = body.classRole === 'TREASURER' ? 'TREASURER' : 'STUDENT'
+    const gender = body.gender === 'female' ? 'Nữ' : (body.gender === 'male' ? 'Nam' : null)
+    const avatar = gender === 'Nữ' ? '/avatars/girl.jpg' : (gender === 'Nam' ? '/avatars/boy.jpg' : null)
 
     if (!isValidEmail(email)) return fail(400, 'Email không đúng định dạng.')
     if (password.length < 6) return fail(400, 'Mật khẩu phải có ít nhất 6 ký tự.')
@@ -119,6 +122,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           passwordHash,
           systemRole: 'STUDENT',
           status: 'ACTIVE',
+          gender: gender,
+          avatar: avatar,
         },
       })
       const member = await tx.classMember.create({

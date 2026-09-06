@@ -8,6 +8,7 @@ export interface StudentRow {
   userId: string
   fullName: string
   email: string
+  avatar: string | null
   status: string
   classRole: string
   joinedAt: string
@@ -29,6 +30,7 @@ export interface ViolationTypeRow {
   name: string
   amount: number
   active: boolean
+  icon: string | null
   _count: { violations: number }
 }
 

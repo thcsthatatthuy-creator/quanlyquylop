@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
-import { requireClassManager } from '@/lib/permissions'
+import { requireClassTreasurerLevel } from '@/lib/permissions'
 import { handle, ok, fail } from '@/lib/api'
 import { logActivity } from '@/lib/audit'
 import { formatVND } from '@/lib/format'
@@ -22,7 +22,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     })
     if (!violation) return fail(404, 'Không tìm thấy vi phạm.')
 
-    const ctx = await requireClassManager(violation.classId)
+    const ctx = await requireClassTreasurerLevel(violation.classId)
     await db.violation.delete({ where: { id } })
 
     await logActivity({

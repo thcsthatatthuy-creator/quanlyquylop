@@ -64,10 +64,9 @@ export function OverviewTab({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <StatCard label="Số dư quỹ" value={formatVNDShort(s.balance)} icon={Wallet} tone="primary" />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
+        <StatCard label="Tổng quỹ (Số dư)" value={formatVNDShort(s.balance)} icon={Wallet} tone="primary" />
         <StatCard label="Tổng thu" value={formatVNDShort(s.totalIncome)} icon={ArrowDownToLine} tone="income" />
-        <StatCard label="Tổng chi" value={formatVNDShort(s.totalExpense)} icon={ArrowUpFromLine} tone="expense" />
         <StatCard
           label="Tiền phạt đã thu"
           value={formatVNDShort(s.penaltyCollected)}

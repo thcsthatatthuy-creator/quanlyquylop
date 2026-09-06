@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch, navigate } from '@/lib/client'
 import { PageHeader, EmptyState, LoadingBlock } from '@/components/shared/ui-bits'
 import { formatVNDShort, formatDate } from '@/lib/format'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { School, Search } from 'lucide-react'
+import { School, Search, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { ConfirmDialog } from '@/components/modals/confirm-dialog'
 
 interface AdminClassRow {
   id: string
@@ -21,10 +23,24 @@ interface AdminClassRow {
 }
 
 export function AdminClasses() {
+  const qc = useQueryClient()
   const [search, setSearch] = useState('')
+  const [deleteClass, setDeleteClass] = useState<{ id: string; name: string } | null>(null)
+
   const { data, isLoading, error } = useQuery<{ classes: AdminClassRow[] }>({
     queryKey: ['admin-classes', search],
     queryFn: () => apiFetch(`/api/admin/classes${search ? `?search=${encodeURIComponent(search)}` : ''}`),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiFetch(`/api/classes/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      toast.success('Đã xóa lớp học.')
+      setDeleteClass(null)
+      qc.invalidateQueries({ queryKey: ['admin-classes'] })
+      qc.invalidateQueries({ queryKey: ['admin-stats'] })
+    },
+    onError: (e) => toast.error(e.message),
   })
 
   return (
@@ -77,15 +93,29 @@ export function AdminClasses() {
                 <span>{c._count.transactions} giao dịch</span>
               </div>
               <p className="mt-2 text-[11px] text-muted-foreground">Tạo ngày {formatDate(c.createdAt)}</p>
-              <div className="mt-4 pt-4 border-t border-border">
-                <Button variant="outline" className="w-full text-blue-700 hover:text-blue-800" onClick={() => navigate(`/admin/classes/${c.id}`)}>
+              <div className="mt-4 pt-4 border-t border-border flex gap-2">
+                <Button variant="outline" className="flex-1 text-blue-700 hover:text-blue-800" onClick={() => navigate(`/admin/classes/${c.id}`)}>
                   Vào lớp
+                </Button>
+                <Button variant="outline" className="text-red-600 hover:text-red-700" onClick={() => setDeleteClass({ id: c.id, name: c.name })}>
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteClass}
+        onClose={() => setDeleteClass(null)}
+        title={`Xóa lớp ${deleteClass?.name}?`}
+        description="Toàn bộ học sinh, vi phạm, giao dịch quỹ của lớp này sẽ bị xóa vĩnh viễn. Thao tác không thể hoàn tác."
+        confirmText="Xóa lớp"
+        destructive
+        loading={deleteMutation.isPending}
+        onConfirm={() => deleteClass && deleteMutation.mutate(deleteClass.id)}
+      />
     </div>
   )
 }

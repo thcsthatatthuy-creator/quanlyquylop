@@ -15,6 +15,8 @@ export function LoginView({ onSuccess }: { onSuccess: (u: AuthUser) => void }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [forgotMode, setForgotMode] = useState(false)
+  const [forgotMessage, setForgotMessage] = useState('')
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -34,6 +36,24 @@ export function LoginView({ onSuccess }: { onSuccess: (u: AuthUser) => void }) {
     }
   }
 
+  async function submitForgot(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email) {
+      toast.error('Vui lòng nhập email.')
+      return
+    }
+    setLoading(true)
+    setForgotMessage('')
+    try {
+      const res = await apiFetch<{ message: string }>('/api/auth/forgot-password', { method: 'POST', json: { email } })
+      setForgotMessage(res.message)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Lỗi server.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-50/60 to-background px-4 py-10">
       <div className="w-full max-w-md">
@@ -45,49 +65,84 @@ export function LoginView({ onSuccess }: { onSuccess: (u: AuthUser) => void }) {
 
         <Card className="shadow-md border-border/70">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Đăng nhập</CardTitle>
+            <CardTitle className="text-lg">{forgotMode ? 'Quên mật khẩu' : 'Đăng nhập'}</CardTitle>
             <CardDescription>
-              Hệ thống tự động xác định lớp của bạn — không cần nhập mã lớp.
+              {forgotMode ? 'Nhập email của bạn để tra cứu thông tin hỗ trợ.' : 'Hệ thống tự động xác định lớp của bạn — không cần nhập mã lớp.'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={submit} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="ten@gmail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="password">Mật khẩu</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-              </Button>
-            </form>
+            {forgotMode ? (
+              <form onSubmit={submitForgot} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="forgot-email">Email</Label>
+                  <Input
+                    id="forgot-email"
+                    type="email"
+                    placeholder="ten@gmail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                {forgotMessage && (
+                  <div className="rounded-md bg-blue-50 p-3 text-sm text-blue-700 font-medium">
+                    {forgotMessage}
+                  </div>
+                )}
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Đang tra cứu...' : 'Gửi yêu cầu'}
+                </Button>
+                <div className="text-center mt-2">
+                  <button type="button" onClick={() => { setForgotMode(false); setForgotMessage(''); }} className="text-sm font-semibold text-muted-foreground hover:text-foreground">
+                    Quay lại đăng nhập
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={submit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="ten@gmail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Mật khẩu</Label>
+                    <button type="button" onClick={() => setForgotMode(true)} className="text-xs font-semibold text-blue-600 hover:underline">
+                      Quên mật khẩu?
+                    </button>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                </Button>
+              </form>
+            )}
 
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              Chưa có tài khoản?{' '}
-              <button
-                onClick={() => navigate('/register')}
-                className="font-semibold text-blue-700 hover:underline"
-              >
-                Đăng ký ngay
-              </button>
-            </p>
+            {!forgotMode && (
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                Chưa có tài khoản?{' '}
+                <button
+                  onClick={() => navigate('/register')}
+                  className="font-semibold text-blue-700 hover:underline"
+                >
+                  Đăng ký ngay
+                </button>
+              </p>
+            )}
           </CardContent>
         </Card>
 

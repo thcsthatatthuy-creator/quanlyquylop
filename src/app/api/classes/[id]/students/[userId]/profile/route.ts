@@ -18,7 +18,7 @@ export async function GET(
     const membership = await db.classMember.findFirst({
       where: { classId: id, userId },
       include: {
-        user: { select: { id: true, fullName: true, email: true, status: true, createdAt: true } },
+        user: { select: { id: true, fullName: true, email: true, status: true, createdAt: true, gender: true, avatar: true } },
       },
     })
     if (!membership) return fail(404, 'Học sinh không thuộc lớp này.')
@@ -50,11 +50,39 @@ export async function GET(
         status: membership.user.status,
         classRole: membership.classRole,
         joinedAt: membership.createdAt,
+        gender: membership.user.gender,
+        avatar: membership.user.avatar,
         violationTotal: violationAgg._sum.amount ?? 0,
         violationCount: violationAgg._count,
         paidTotal: paidAgg._sum.amount ?? 0,
       },
       violations,
     })
+  })
+}
+
+/**
+ * PATCH /api/classes/[id]/students/[userId]/profile
+ * Cập nhật hồ sơ học sinh (giới tính, avatar)
+ */
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string; userId: string }> }
+) {
+  return handle(async () => {
+    const { id, userId } = await params
+    await requireClassTreasurerLevel(id) // Giáo viên hoặc thủ quỹ có thể sửa
+    const { gender, avatar } = await req.json()
+
+    const updated = await db.user.update({
+      where: { id: userId },
+      data: {
+        ...(gender !== undefined && { gender }),
+        ...(avatar !== undefined && { avatar }),
+      },
+      select: { id: true, gender: true, avatar: true },
+    })
+
+    return ok(updated)
   })
 }

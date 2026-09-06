@@ -47,8 +47,14 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       db.classMember.count({ where: { classId: id } }),
     ])
 
-    const income = txAgg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
+    const rawIncome = txAgg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
     const expense = txAgg.find((a) => a.type === 'EXPENSE')?._sum.amount ?? 0
+    const penaltyCollected = penaltyAgg._sum.amount ?? 0
+    const violationTotal = violationAgg._sum.amount ?? 0
+    
+    // New logic: Violations are automatically added to the fund.
+    // To avoid double counting old PENALTY_PAYMENT transactions, we subtract penaltyCollected.
+    const income = rawIncome - penaltyCollected + violationTotal
 
     // Chuỗi theo tháng: thu / chi / tiền phạt
     const monthlyMap = new Map<string, { month: string; thu: number; chi: number; phat: number }>()
@@ -103,8 +109,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         balance: income - expense,
         totalIncome: income,
         totalExpense: expense,
-        penaltyCollected: penaltyAgg._sum.amount ?? 0,
-        violationTotal: violationAgg._sum.amount ?? 0,
+        penaltyCollected: penaltyCollected,
+        violationTotal: violationTotal,
         violationCount: violationAgg._count,
       },
       monthly,

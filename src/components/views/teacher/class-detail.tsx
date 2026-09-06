@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { apiFetch } from '@/lib/client'
 import { cn } from '@/lib/utils'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { OverviewTab } from '@/components/views/teacher/tabs/overview-tab'
@@ -13,7 +12,9 @@ import { ViolationsTab } from '@/components/views/teacher/tabs/violations-tab'
 import { FundTab } from '@/components/views/teacher/tabs/fund-tab'
 import { TransactionsTab } from '@/components/views/teacher/tabs/transactions-tab'
 import { ReportsTab } from '@/components/views/teacher/tabs/reports-tab'
+import { SummaryTab } from '@/components/views/teacher/tabs/summary-tab'
 import { ErrorState, LoadingBlock } from '@/components/shared/ui-bits'
+import { StudentProfilePage } from '@/components/views/teacher/student-profile-page'
 
 const TABS = [
   { key: 'overview', label: 'Tổng quan' },
@@ -22,6 +23,7 @@ const TABS = [
   { key: 'fund', label: 'Quỹ lớp' },
   { key: 'transactions', label: 'Giao dịch' },
   { key: 'reports', label: 'Báo cáo' },
+  { key: 'summary', label: 'Tổng kết' },
 ]
 
 interface ClassDetailData {
@@ -56,6 +58,7 @@ export function ClassDetail({
 
   const isManager = data?.access === 'ADMIN' || data?.access === 'OWNER'
   const [key, setKey] = useState(0) // force remount tabs after mutations when needed
+  const [studentProfileId, setStudentProfileId] = useState<string | null>(null)
 
   if (isLoading) {
     return <LoadingBlock />
@@ -109,14 +112,32 @@ export function ClassDetail({
         </div>
       </div>
 
-      {tab === 'overview' && <OverviewTab classId={classId} data={data} />}
-      {tab === 'students' && <StudentsTab classId={classId} isManager={isManager} />}
-      {tab === 'violations' && (
-        <ViolationsTab classId={classId} isManager={isManager} onChanged={() => setKey((k) => k + 1)} />
+      {studentProfileId ? (
+        <StudentProfilePage
+          classId={classId}
+          userId={studentProfileId}
+          isManager={isManager}
+          onBack={() => setStudentProfileId(null)}
+        />
+      ) : (
+        <>
+          {tab === 'overview' && <OverviewTab classId={classId} data={data} />}
+          {tab === 'students' && (
+            <StudentsTab
+              classId={classId}
+              isManager={isManager}
+              onViewProfile={(userId) => setStudentProfileId(userId)}
+            />
+          )}
+          {tab === 'violations' && (
+            <ViolationsTab classId={classId} isManager={isManager} onChanged={() => setKey((k) => k + 1)} />
+          )}
+          {tab === 'fund' && <FundTab classId={classId} isManager={isManager} />}
+          {tab === 'transactions' && <TransactionsTab classId={classId} isManager={isManager} />}
+          {tab === 'reports' && <ReportsTab classId={classId} isManager={isManager} />}
+          {tab === 'summary' && <SummaryTab classId={classId} isManager={isManager} />}
+        </>
       )}
-      {tab === 'fund' && <FundTab classId={classId} isManager={isManager} />}
-      {tab === 'transactions' && <TransactionsTab classId={classId} isManager={isManager} />}
-      {tab === 'reports' && <ReportsTab classId={classId} isManager={isManager} />}
     </div>
   )
 }

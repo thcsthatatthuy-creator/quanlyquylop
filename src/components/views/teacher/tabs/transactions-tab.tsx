@@ -6,12 +6,12 @@ import { apiFetch } from '@/lib/client'
 import { useClassStudents } from '@/components/views/teacher/tabs/use-class-data'
 import { PageHeader, EmptyState, LoadingBlock } from '@/components/shared/ui-bits'
 import { formatVND, formatDate } from '@/lib/format'
-import { AmountText, TypeBadge, CategoryLabel } from '@/components/shared/badges'
+import { AmountText, CategoryLabel } from '@/components/shared/badges'
 import { TransactionModal } from '@/components/modals/transaction-modal'
 import { ConfirmDialog } from '@/components/modals/confirm-dialog'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { Plus, ReceiptText, Trash2, CirclePlus, CircleMinus } from 'lucide-react'
+import { Plus, ReceiptText, Trash2, CirclePlus } from 'lucide-react'
 
 interface TxRow {
   id: string
@@ -22,7 +22,7 @@ interface TxRow {
   note: string | null
   createdAt: string
   student: { fullName: string } | null
-  creator: { fullName: string; systemRole: string }
+  creator: { fullName: string; systemRole: string } | null
 }
 
 export function TransactionsTab({
@@ -34,7 +34,6 @@ export function TransactionsTab({
 }) {
   const qc = useQueryClient()
   const [incomeOpen, setIncomeOpen] = useState(false)
-  const [expenseOpen, setExpenseOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<TxRow | null>(null)
   const [page, setPage] = useState(1)
 
@@ -75,16 +74,11 @@ export function TransactionsTab({
     <div>
       <PageHeader
         title="Giao dịch quỹ"
-        description="Thêm khoản thu (đóng quỹ, tiền phạt) và khoản chi. Số dư do backend tự tính lại."
+        description="Thêm khoản thu (đóng quỹ, tiền phạt). Số dư do backend tự tính lại."
         actions={
-          <>
-            <Button variant="destructive" onClick={() => setExpenseOpen(true)} className="gap-2 bg-red-600 hover:bg-red-700">
-              <CircleMinus className="h-4 w-4" /> Thêm khoản chi
-            </Button>
-            <Button onClick={() => setIncomeOpen(true)} className="gap-2">
-              <CirclePlus className="h-4 w-4" /> Thêm khoản thu
-            </Button>
-          </>
+          <Button onClick={() => setIncomeOpen(true)} className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+            <CirclePlus className="h-4 w-4" /> Thêm khoản thu
+          </Button>
         }
       />
 
@@ -96,14 +90,9 @@ export function TransactionsTab({
           title="Chưa có giao dịch nào"
           description="Ghi nhận khoản thu đầu tiên để bắt đầu hình thành quỹ lớp."
           action={
-            <div className="flex gap-2">
-              <Button onClick={() => setIncomeOpen(true)} className="gap-2">
-                <Plus className="h-4 w-4" /> Thêm khoản thu
-              </Button>
-              <Button variant="outline" onClick={() => setExpenseOpen(true)} className="gap-2">
-                <Plus className="h-4 w-4" /> Thêm khoản chi
-              </Button>
-            </div>
+            <Button onClick={() => setIncomeOpen(true)} className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+              <Plus className="h-4 w-4" /> Thêm khoản thu
+            </Button>
           }
         />
       ) : (
@@ -112,8 +101,8 @@ export function TransactionsTab({
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
               <tr>
                 <th className="px-4 py-3 font-semibold">Ngày</th>
-                <th className="px-4 py-3 font-semibold">Loại</th>
                 <th className="px-4 py-3 font-semibold">Nội dung</th>
+                <th className="px-4 py-3 font-semibold">Phân loại</th>
                 <th className="px-4 py-3 font-semibold">Người tạo</th>
                 <th className="px-4 py-3 text-right font-semibold">Số tiền</th>
                 {isManager && <th className="w-16 px-4 py-3" />}
@@ -121,33 +110,28 @@ export function TransactionsTab({
             </thead>
             <tbody>
               {data!.transactions.map((tx) => (
-                <tr key={tx.id} className="border-t border-border">
+                <tr key={tx.id} className="border-t border-border hover:bg-slate-50">
                   <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{formatDate(tx.createdAt)}</td>
                   <td className="px-4 py-3">
-                    <div className="flex flex-col gap-1">
-                      <TypeBadge type={tx.type} />
-                      <span className="text-xs text-muted-foreground">
-                        <CategoryLabel category={tx.category} />
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="font-medium">
+                    <p className="font-medium text-slate-800">
                       {tx.student ? `${tx.student.fullName} — ` : ''}
                       {tx.description}
                     </p>
-                    {tx.note && <p className="text-xs text-muted-foreground">{tx.note}</p>}
+                    {tx.note && <p className="text-xs text-muted-foreground mt-0.5">{tx.note}</p>}
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground">{tx.creator.fullName}</td>
+                  <td className="px-4 py-3">
+                    <CategoryLabel category={tx.category} />
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{tx.creator?.fullName || 'Hệ thống'}</td>
                   <td className="px-4 py-3 text-right">
-                    <AmountText type={tx.type} amount={tx.amount} />
+                    <AmountText type="INCOME" amount={tx.amount} />
                   </td>
                   {isManager && (
                     <td className="px-4 py-3 text-right">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-red-600"
+                        className="h-7 w-7 text-red-600 hover:bg-red-50 hover:text-red-700"
                         onClick={() => setDeleteTarget(tx)}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -184,19 +168,11 @@ export function TransactionsTab({
         students={studentOptions}
         onCreated={invalidate}
       />
-      <TransactionModal
-        open={expenseOpen}
-        onClose={() => setExpenseOpen(false)}
-        classId={classId}
-        type="EXPENSE"
-        students={studentOptions}
-        onCreated={invalidate}
-      />
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         title="Xóa giao dịch quỹ?"
-        description={`${deleteTarget?.type === 'INCOME' ? 'Khoản thu' : 'Khoản chi'} ${formatVND(deleteTarget?.amount ?? 0)} — "${deleteTarget?.description}". Thao tác sẽ được ghi vào lịch sử hoạt động.`}
+        description={`Khoản thu ${formatVND(deleteTarget?.amount ?? 0)} — "${deleteTarget?.description}". Thao tác sẽ được ghi vào lịch sử hoạt động.`}
         confirmText="Xóa giao dịch"
         destructive
         loading={deleteMutation.isPending}

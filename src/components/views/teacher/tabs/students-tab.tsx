@@ -9,7 +9,6 @@ import { RoleBadge, StatusBadge } from '@/components/shared/badges'
 import { formatVND } from '@/lib/format'
 import { CreateStudentModal, ResetPasswordModal } from '@/components/modals/student-modals'
 import { ImportStudentsModal } from '@/components/modals/import-students-modal'
-import { StudentProfileModal } from '@/components/modals/student-profile-modal'
 import { ConfirmDialog } from '@/components/modals/confirm-dialog'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -40,6 +39,7 @@ import {
   Plus,
   Search,
   Upload,
+  Download,
   MoreHorizontal,
   Eye,
   KeyRound,
@@ -50,7 +50,7 @@ import {
   Users,
 } from 'lucide-react'
 
-export function StudentsTab({ classId, isManager }: { classId: string; isManager: boolean }) {
+export function StudentsTab({ classId, isManager, onViewProfile }: { classId: string; isManager: boolean; onViewProfile?: (userId: string) => void }) {
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('all')
@@ -60,7 +60,6 @@ export function StudentsTab({ classId, isManager }: { classId: string; isManager
 
   const [createOpen, setCreateOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
-  const [profileTarget, setProfileTarget] = useState<{ membershipId: string; userId: string; fullName: string } | null>(null)
   const [resetTarget, setResetTarget] = useState<{ userId: string; fullName: string } | null>(null)
   const [roleTarget, setRoleTarget] = useState<{ userId: string; fullName: string; classRole: string } | null>(null)
   const [lockTarget, setLockTarget] = useState<{ userId: string; fullName: string; status: string } | null>(null)
@@ -135,6 +134,9 @@ export function StudentsTab({ classId, isManager }: { classId: string; isManager
         actions={
           isManager && (
             <>
+              <Button variant="outline" onClick={() => window.open(`/api/classes/${classId}/export`, '_blank')} className="gap-2">
+                <Download className="h-4 w-4" /> Xuất Excel
+              </Button>
               <Button variant="outline" onClick={() => setImportOpen(true)} className="gap-2">
                 <Upload className="h-4 w-4" /> Import Excel
               </Button>
@@ -260,7 +262,7 @@ export function StudentsTab({ classId, isManager }: { classId: string; isManager
                     <TableCell>
                       <button
                         className="font-medium hover:text-blue-700 hover:underline"
-                        onClick={() => setProfileTarget({ membershipId: s.membershipId, userId: s.userId, fullName: s.fullName })}
+                        onClick={() => onViewProfile ? onViewProfile(s.userId) : undefined}
                       >
                         {s.fullName}
                       </button>
@@ -284,9 +286,7 @@ export function StudentsTab({ classId, isManager }: { classId: string; isManager
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem
-                            onClick={() =>
-                              setProfileTarget({ membershipId: s.membershipId, userId: s.userId, fullName: s.fullName })
-                            }
+                            onClick={() => onViewProfile ? onViewProfile(s.userId) : undefined}
                           >
                             <Eye className="mr-2 h-4 w-4" /> Xem hồ sơ
                           </DropdownMenuItem>
@@ -347,7 +347,7 @@ export function StudentsTab({ classId, isManager }: { classId: string; isManager
                 <div className="flex items-start justify-between gap-2">
                   <button
                     className="min-w-0 text-left"
-                    onClick={() => setProfileTarget({ membershipId: s.membershipId, userId: s.userId, fullName: s.fullName })}
+                    onClick={() => onViewProfile ? onViewProfile(s.userId) : undefined}
                   >
                     <p className="truncate font-semibold">{s.fullName}</p>
                     <p className="truncate text-xs text-muted-foreground">{s.email}</p>
@@ -359,14 +359,14 @@ export function StudentsTab({ classId, isManager }: { classId: string; isManager
                   <StatusBadge status={s.status} />
                 </div>
                 <div className="mt-3 flex gap-2 border-t pt-3">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 gap-1.5"
-                    onClick={() => setProfileTarget({ membershipId: s.membershipId, userId: s.userId, fullName: s.fullName })}
-                  >
-                    <Eye className="h-3.5 w-3.5" /> Xem
-                  </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 gap-1.5"
+                      onClick={() => onViewProfile ? onViewProfile(s.userId) : undefined}
+                    >
+                      <Eye className="h-3.5 w-3.5" /> Xem
+                    </Button>
                   {isManager && (
                     <>
                       <Button
@@ -450,11 +450,6 @@ export function StudentsTab({ classId, isManager }: { classId: string; isManager
         onClose={() => setImportOpen(false)}
         classId={classId}
         onImported={invalidateAll}
-      />
-      <StudentProfileModal
-        classId={classId}
-        target={profileTarget}
-        onClose={() => setProfileTarget(null)}
       />
       <ResetPasswordModal
         classId={classId}

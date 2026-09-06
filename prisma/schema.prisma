@@ -19,6 +19,8 @@ model User {
   passwordHash String
   systemRole   String   @default("STUDENT")
   status       String   @default("ACTIVE")
+  avatar       String?
+  gender       String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -48,6 +50,7 @@ model Class {
   violationTypes ViolationType[]
   violations     Violation[]
   transactions   FundTransaction[]
+  summaries      ClassSummary[]
 }
 
 // ============================================================
@@ -75,6 +78,7 @@ model ViolationType {
   class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
   name      String
   amount    Int
+  icon      String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -95,8 +99,8 @@ model Violation {
   violationType   ViolationType @relation(fields: [violationTypeId], references: [id])
   amount          Int
   note            String?
-  createdBy       String
-  creator         User          @relation("ViolationCreator", fields: [createdBy], references: [id])
+  createdBy       String?
+  creator         User?         @relation("ViolationCreator", fields: [createdBy], references: [id], onDelete: SetNull)
   createdAt       DateTime      @default(now())
 }
 
@@ -117,8 +121,8 @@ model FundTransaction {
   student     User?    @relation("StudentTransactions", fields: [studentId], references: [id], onDelete: SetNull)
   description String
   note        String?
-  createdBy   String
-  creator     User     @relation("TransactionCreator", fields: [createdBy], references: [id])
+  createdBy   String?
+  creator     User?    @relation("TransactionCreator", fields: [createdBy], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
 }
 
@@ -135,4 +139,16 @@ model ActivityLog {
   classId    String?
   metadata   String?
   createdAt  DateTime @default(now())
+}
+
+// ============================================================
+// CLASS SUMMARY - Lịch sử tổng kết cuối năm
+// ============================================================
+model ClassSummary {
+  id        String   @id @default(cuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name      String
+  data      String   // JSON string containing rankings and summary
+  createdAt DateTime @default(now())
 }

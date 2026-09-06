@@ -185,6 +185,8 @@ export function AddViolationModal({
   )
 }
 
+import { Copy } from 'lucide-react'
+
 export function ViolationTypeModal({
   open,
   onClose,
@@ -195,17 +197,19 @@ export function ViolationTypeModal({
   open: boolean
   onClose: () => void
   classId: string
-  editing: { id: string; name: string; amount: number; active: boolean } | null
+  editing: { id: string; name: string; amount: number; active: boolean; icon: string | null } | null
   onSaved: () => void
 }) {
   const [name, setName] = useState('')
   const [amount, setAmount] = useState<number | ''>('')
+  const [icon, setIcon] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (open) {
       setName(editing?.name ?? '')
       setAmount(editing?.amount ?? '')
+      setIcon(editing?.icon ?? '')
     }
   }, [open, editing])
 
@@ -218,13 +222,13 @@ export function ViolationTypeModal({
       if (editing) {
         await apiFetch(`/api/violation-types/${editing.id}`, {
           method: 'PATCH',
-          json: { name: name.trim(), amount: Number(amount) },
+          json: { name: name.trim(), amount: Number(amount), icon: icon.trim() || null },
         })
         toast.success('Đã cập nhật loại vi phạm.')
       } else {
         await apiFetch(`/api/classes/${classId}/violation-types`, {
           method: 'POST',
-          json: { name: name.trim(), amount: Number(amount) },
+          json: { name: name.trim(), amount: Number(amount), icon: icon.trim() || null },
         })
         toast.success('Đã thêm loại vi phạm.')
       }
@@ -256,6 +260,20 @@ export function ViolationTypeModal({
               onChange={(e) => setName(e.target.value)}
             />
           </div>
+          {editing && (
+            <div className="space-y-1.5">
+              <Label htmlFor="vt-icon">Biểu tượng (Emoji hoặc URL ảnh)</Label>
+              <Input
+                id="vt-icon"
+                placeholder="Ví dụ: ⏰, 🗣️, 📱 hoặc dán link ảnh"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+              />
+              <p className="text-[10px] text-slate-500">
+                Để trống để hệ thống tự động tạo bằng AI theo tên vi phạm.
+              </p>
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label>Số tiền mặc định *</Label>
             <MoneyInput value={amount} onChange={setAmount} placeholder="10.000" />

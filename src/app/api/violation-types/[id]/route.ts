@@ -3,6 +3,7 @@ import { db } from '@/lib/db'
 import { requireClassManager } from '@/lib/permissions'
 import { handle, ok, fail, requireString, parseAmount, optionalString } from '@/lib/api'
 import { logActivity } from '@/lib/audit'
+import { generateViolationIcon } from '@/lib/hf'
 
 /**
  * PATCH /api/violation-types/[id]
@@ -22,6 +23,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (body.amount !== undefined) data.amount = parseAmount(body.amount)
     if (body.active !== undefined) data.active = Boolean(body.active)
     if (body.description !== undefined) data.description = optionalString(body.description, 500)
+    
+    if (body.icon !== undefined) {
+      if (body.icon) {
+        data.icon = requireString(body.icon, 'Biểu tượng', 1000)
+      } else {
+        // Nếu người dùng xóa icon cũ đi, tự động tạo mới lại bằng Hugging Face AI
+        const targetName = data.name || type.name
+        try {
+          data.icon = await generateViolationIcon(targetName as string)
+        } catch (err) {
+          console.error('Lỗi khi tạo icon bằng Hugging Face:', err)
+          // Nếu lỗi thì gán null
+          data.icon = null
+        }
+      }
+    }
 
     if (data.name && data.name !== type.name) {
       const dup = await db.violationType.findFirst({
@@ -38,7 +55,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       targetType: 'VIOLATION_TYPE',
       targetId: id,
       classId: type.classId,
-      metadata: { name: updated.name, amount: updated.amount, active: updated.active },
+      metadata: { name: updated.name, amount: updated.amount, icon: updated.icon, active: updated.active },
     })
 
     return ok({ violationType: updated })

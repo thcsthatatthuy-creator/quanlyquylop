@@ -23,9 +23,9 @@ export function isActive(path: string, itemPath: string): boolean {
 
 function Brand() {
   return (
-    <div className="flex items-center justify-center px-5 py-4">
-      <div className="flex h-12 w-32 shrink-0 items-center justify-center overflow-hidden">
-        <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
+    <div className="flex items-center justify-center px-4 py-8">
+      <div className="flex h-24 w-48 shrink-0 items-center justify-center overflow-hidden">
+        <img src="/logo.png" alt="Logo" className="h-full w-full object-contain drop-shadow-sm scale-[1.15]" />
       </div>
     </div>
   )
@@ -179,9 +179,9 @@ export function AppFrame({
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex items-center justify-center">
-            <div className="flex h-9 w-28 items-center justify-center overflow-hidden">
-              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
+          <div className="flex items-center justify-center flex-1">
+            <div className="flex h-12 w-36 items-center justify-center overflow-hidden mt-1">
+              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain scale-110" />
             </div>
           </div>
           <button

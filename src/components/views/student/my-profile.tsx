@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator'
 import { UserRound, TriangleAlert, BadgeCheck, Hourglass } from 'lucide-react'
 
 interface OverviewData {
-  profile: { fullName: string; email: string }
+  profile: { fullName: string; email: string; avatar: string | null }
   classInfo: {
     id: string
     name: string
@@ -48,8 +48,12 @@ export function MyProfile() {
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-800">
-                {data!.profile.fullName.charAt(0).toUpperCase()}
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-2xl font-bold text-blue-800 overflow-hidden relative shadow-sm border border-slate-200">
+                {data!.profile.avatar ? (
+                  <img src={data!.profile.avatar} alt={data!.profile.fullName} className="h-full w-full object-cover" />
+                ) : (
+                  data!.profile.fullName.charAt(0).toUpperCase()
+                )}
               </div>
               <div className="min-w-0">
                 <p className="text-lg font-bold">{data!.profile.fullName}</p>

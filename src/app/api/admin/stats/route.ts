@@ -22,8 +22,12 @@ export async function GET() {
         }),
       ])
 
-    const income = txAgg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
+    const rawIncome = txAgg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
     const expense = txAgg.find((a) => a.type === 'EXPENSE')?._sum.amount ?? 0
+    const penaltyAgg = await db.fundTransaction.aggregate({
+      where: { type: 'INCOME', category: 'PENALTY_PAYMENT' },
+      _sum: { amount: true },
+    })
 
     const violationAgg = await db.violation.aggregate({ _sum: { amount: true }, _count: true })
     const recentUsers = await db.user.findMany({
@@ -31,6 +35,10 @@ export async function GET() {
       take: 6,
       select: { id: true, fullName: true, email: true, systemRole: true, status: true, createdAt: true },
     })
+    
+    const penaltyIncome = penaltyAgg._sum.amount ?? 0
+    const violationTotal = violationAgg._sum.amount ?? 0
+    const income = rawIncome - penaltyIncome + violationTotal
 
     return ok({
       stats: {
@@ -40,7 +48,7 @@ export async function GET() {
         pendingTeachers,
         totalClasses,
         totalFundBalance: income - expense,
-        violationTotal: violationAgg._sum.amount ?? 0,
+        violationTotal: violationTotal,
         violationCount: violationAgg._count,
       },
       recentUsers,

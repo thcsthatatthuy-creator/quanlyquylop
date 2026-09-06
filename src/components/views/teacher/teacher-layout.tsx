@@ -5,7 +5,8 @@ import { useAuth } from '@/components/providers'
 import { TeacherDashboard } from '@/components/views/teacher/teacher-dashboard'
 import { ClassDetail } from '@/components/views/teacher/class-detail'
 import { AuditView } from '@/components/views/shared/audit-view'
-import { LayoutDashboard, History } from 'lucide-react'
+import { LuckyWheelView } from '@/components/views/teacher/lucky-wheel-view'
+import { LayoutDashboard, History, Gift } from 'lucide-react'
 
 export function TeacherLayout({ path }: { path: string }) {
   const auth = useAuth()
@@ -14,6 +15,7 @@ export function TeacherLayout({ path }: { path: string }) {
   const detailMatch = path.match(/^\/classes\/([^/]+)(?:\/([^/]+))?$/)
 
   const navItems: NavItem[] = [
+    { label: 'Vòng quay may mắn', icon: Gift, path: '/wheel' },
     { label: 'Tổng quan', icon: LayoutDashboard, path: '/classes' },
     { label: 'Lịch sử hoạt động', icon: History, path: '/audit' },
   ]
@@ -34,6 +36,8 @@ export function TeacherLayout({ path }: { path: string }) {
     )
   } else if (path.startsWith('/audit')) {
     content = <AuditView variant="teacher" />
+  } else if (path.startsWith('/wheel')) {
+    content = <LuckyWheelView />
   } else {
     content = <TeacherDashboard />
   }

@@ -46,12 +46,16 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       }),
     ])
 
-    const income = txAgg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
+    const rawIncome = txAgg.find((a) => a.type === 'INCOME')?._sum.amount ?? 0
     const expense = txAgg.find((a) => a.type === 'EXPENSE')?._sum.amount ?? 0
-    const penaltyIncome = await db.fundTransaction.aggregate({
+    const penaltyCollected = await db.fundTransaction.aggregate({
       where: { classId: id, type: 'INCOME', category: 'PENALTY_PAYMENT' },
       _sum: { amount: true },
     })
+    
+    const violationTotal = violationAgg._sum.amount ?? 0
+    const penaltyIncome = penaltyCollected._sum.amount ?? 0
+    const income = rawIncome - penaltyIncome + violationTotal
 
     return ok({
       class: ctx.class,
@@ -61,8 +65,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         balance: income - expense,
         totalIncome: income,
         totalExpense: expense,
-        penaltyCollected: penaltyIncome._sum.amount ?? 0,
-        violationTotal: violationAgg._sum.amount ?? 0,
+        penaltyCollected: penaltyIncome,
+        violationTotal: violationTotal,
         violationCount: violationAgg._count,
       },
       recentTransactions,

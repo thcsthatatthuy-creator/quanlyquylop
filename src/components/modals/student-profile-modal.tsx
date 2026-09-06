@@ -1,6 +1,5 @@
-'use client'
-
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +12,11 @@ import { formatVND, formatDate, formatDateTime } from '@/lib/format'
 import { RoleBadge, StatusBadge } from '@/components/shared/badges'
 import { LoadingBlock } from '@/components/shared/ui-bits'
 import { Separator } from '@/components/ui/separator'
-import { AlertTriangle, Inbox } from 'lucide-react'
+import { AlertTriangle, Inbox, Edit2, Check, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { toast } from 'sonner'
+import Image from 'next/image'
 
 interface ProfileData {
   student: {
@@ -26,6 +29,8 @@ interface ProfileData {
     violationTotal: number
     violationCount: number
     joinedAt: string
+    gender: string | null
+    avatar: string | null
   }
   violations: {
     id: string
@@ -36,15 +41,29 @@ interface ProfileData {
   }[]
 }
 
+const AVATAR_OPTIONS = [
+  '/avatars/boy.jpg',
+  '/avatars/girl.jpg',
+  '/avatars/boy2.jpg',
+  '/avatars/girl2.jpg',
+]
+
 export function StudentProfileModal({
   classId,
   target,
+  isManager,
   onClose,
 }: {
   classId: string
   target: { membershipId: string; userId: string; fullName: string } | null
+  isManager?: boolean
   onClose: () => void
 }) {
+  const qc = useQueryClient()
+  const [isEditing, setIsEditing] = useState(false)
+  const [editGender, setEditGender] = useState<string>('')
+  const [editAvatar, setEditAvatar] = useState<string>('')
+
   const { data, isLoading } = useQuery<ProfileData>({
     queryKey: ['student-profile', classId, target?.userId],
     queryFn: () =>
@@ -52,11 +71,45 @@ export function StudentProfileModal({
     enabled: !!target && !!classId,
   })
 
+  useEffect(() => {
+    if (data?.student) {
+      setEditGender(data.student.gender || 'MALE')
+      setEditAvatar(data.student.avatar || AVATAR_OPTIONS[0])
+    }
+  }, [data])
+
+  const updateMutation = useMutation({
+    mutationFn: (v: { gender: string; avatar: string }) =>
+      apiFetch(`/api/classes/${classId}/students/${target!.userId}/profile`, {
+        method: 'PATCH',
+        json: v,
+      }),
+    onSuccess: () => {
+      toast.success('Đã cập nhật hồ sơ')
+      setIsEditing(false)
+      qc.invalidateQueries({ queryKey: ['student-profile', classId, target?.userId] })
+      qc.invalidateQueries({ queryKey: ['class-students', classId] })
+    },
+    onError: (e) => toast.error(e.message),
+  })
+
+  const handleClose = () => {
+    setIsEditing(false)
+    onClose()
+  }
+
   return (
-    <Dialog open={!!target} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+    <Dialog open={!!target} onOpenChange={(v) => !v && handleClose()}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Hồ sơ học sinh</DialogTitle>
+          <DialogTitle className="flex justify-between items-center pr-4">
+            <span>Hồ sơ học sinh</span>
+            {isManager && !isEditing && (
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="h-8 gap-2">
+                <Edit2 className="w-3.5 h-3.5" /> Chỉnh sửa
+              </Button>
+            )}
+          </DialogTitle>
           <DialogDescription>Thông tin vi phạm và tình trạng đóng góp của học sinh.</DialogDescription>
         </DialogHeader>
 
@@ -65,14 +118,71 @@ export function StudentProfileModal({
         ) : (
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-muted/30 p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-lg font-bold leading-tight">{data.student.fullName}</p>
-                  <p className="text-sm text-muted-foreground">{data.student.email}</p>
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 shrink-0 relative rounded-full overflow-hidden border border-slate-200">
+                  <Image 
+                    src={data.student.avatar || AVATAR_OPTIONS[0]} 
+                    alt="avatar" 
+                    fill 
+                    className="object-cover"
+                  />
                 </div>
-                <RoleBadge role={data.student.classRole} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-lg font-bold leading-tight">{data.student.fullName}</p>
+                      <p className="text-sm text-muted-foreground">{data.student.email}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Giới tính: {data.student.gender === 'FEMALE' ? 'Nữ' : 'Nam'}</p>
+                    </div>
+                    <RoleBadge role={data.student.classRole} />
+                  </div>
+                </div>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-3">
+
+              {isEditing && (
+                <div className="mt-4 p-4 border rounded-lg bg-white shadow-sm space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Giới tính</label>
+                    <Select value={editGender} onValueChange={setEditGender}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MALE">Nam</SelectItem>
+                        <SelectItem value="FEMALE">Nữ</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Chọn ảnh đại diện</label>
+                    <div className="flex flex-wrap gap-3">
+                      {AVATAR_OPTIONS.map((av) => (
+                        <button
+                          key={av}
+                          onClick={() => setEditAvatar(av)}
+                          className={`w-14 h-14 relative rounded-full border-2 overflow-hidden transition-all ${
+                            editAvatar === av ? 'border-blue-600 ring-2 ring-blue-200 scale-110' : 'border-transparent hover:scale-105'
+                          }`}
+                        >
+                          <Image src={av} alt="avatar option" fill className="object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>Hủy</Button>
+                    <Button 
+                      size="sm" 
+                      onClick={() => updateMutation.mutate({ gender: editGender, avatar: editAvatar })}
+                      disabled={updateMutation.isPending}
+                    >
+                      {updateMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="rounded-lg bg-red-50 px-3 py-2">
                   <p className="text-[11px] font-medium text-red-700">Tổng vi phạm</p>
                   <p className="text-base font-bold text-red-800">
