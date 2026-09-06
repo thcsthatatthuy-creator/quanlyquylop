@@ -1,9 +1,10 @@
 import { db } from '@/lib/db'
-import { requireAuth } from '@/lib/auth'
+import { getSessionUser } from '@/lib/auth'
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
-    const user = await requireAuth()
+    const user = await getSessionUser()
+    if (!user) return new Response('Unauthorized', { status: 401 })
     const { id } = params
     
     // Check permission

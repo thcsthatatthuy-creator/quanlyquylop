@@ -107,11 +107,11 @@ function BottomNav({ navItems, path }: { navItems: NavItem[]; path: string }) {
             key={item.path}
             onClick={() => navigate(item.path)}
             className={cn(
-              'relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium',
-              active ? 'text-blue-700' : 'text-slate-500'
+              'relative flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium transition-colors',
+              active ? 'text-blue-700' : 'text-slate-500 hover:text-slate-700'
             )}
           >
-            <item.icon className={cn('h-5 w-5', active && 'text-blue-700')} />
+            <item.icon className={cn('h-6 w-6', active && 'text-blue-700')} />
             <span className="max-w-full truncate">{item.label}</span>
             {active && <span className="absolute top-0 h-0.5 w-10 rounded-full bg-blue-600" />}
             {typeof item.badge === 'number' && item.badge > 0 && (
@@ -171,13 +171,13 @@ export function AppFrame({
       {/* Nội dung */}
       <div className="lg:pl-64">
         {/* Topbar mobile */}
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-white/90 px-4 py-3 backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-white/95 px-4 py-2 backdrop-blur lg:hidden shadow-sm">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-slate-100"
+            className="flex h-11 w-11 items-center justify-center rounded-xl hover:bg-slate-100 active:bg-slate-200 transition-colors"
             aria-label="Mở menu"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-6 w-6 text-slate-700" />
           </button>
           <div className="flex items-center justify-center flex-1">
             <div className="flex h-12 w-36 items-center justify-center overflow-hidden mt-1">
@@ -186,14 +186,14 @@ export function AppFrame({
           </div>
           <button
             onClick={auth.logout}
-            className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-slate-100"
+            className="flex h-11 w-11 items-center justify-center rounded-xl hover:bg-red-50 active:bg-red-100 transition-colors"
             aria-label="Đăng xuất"
           >
-            <LogOut className="h-5 w-5 text-slate-600" />
+            <LogOut className="h-6 w-6 text-slate-600 hover:text-red-600" />
           </button>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl px-4 py-5 pb-24 sm:px-6 lg:px-8 lg:pb-10">
+        <main className="mx-auto w-full max-w-6xl px-4 py-5 pb-28 sm:px-6 lg:px-8 lg:pb-10 min-h-[80vh]">
           {children}
         </main>
       </div>
