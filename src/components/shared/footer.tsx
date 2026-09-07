@@ -8,14 +8,14 @@ export function Footer() {
           <p className="font-medium text-foreground">Dự án được phát triển bởi Nhật Thiện</p>
           <p>&copy; 2026 - LazyBucket - All Rights Reserved.</p>
         </div>
-
+        
         <div className="flex flex-col items-center gap-2 mt-2">
           <p className="text-xs text-muted-foreground">
-            Cùng với sự tài trợ từ Tập đoàn Công nghiệp – Viễn thông Quân đội
+            Cùng với sự tài trợ từ Tập đoàn Công nghiệp – Viễn thông Quân đội 
           </p>
-          <img
-            src="https://vtsmas.vn/assets/media/logos/viettel.png"
-            alt="Viettel Logo"
+          <img 
+            src="https://vtsmas.vn/assets/media/logos/viettel.png" 
+            alt="Viettel Logo" 
             className="h-8 md:h-10 object-contain opacity-90 hover:opacity-100 transition-opacity"
           />
         </div>

@@ -7,7 +7,7 @@ import { useClassStudents } from '@/components/views/teacher/tabs/use-class-data
 import { PageHeader, EmptyState, LoadingBlock } from '@/components/shared/ui-bits'
 import { RoleBadge, StatusBadge } from '@/components/shared/badges'
 import { formatVND } from '@/lib/format'
-import { CreateStudentModal, ResetPasswordModal } from '@/components/modals/student-modals'
+import { CreateStudentModal, ResetPasswordModal, RenameStudentModal } from '@/components/modals/student-modals'
 import { ImportStudentsModal } from '@/components/modals/import-students-modal'
 import { ConfirmDialog } from '@/components/modals/confirm-dialog'
 import { toast } from 'sonner'
@@ -60,6 +60,7 @@ export function StudentsTab({ classId, isManager, onViewProfile }: { classId: st
 
   const [createOpen, setCreateOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
+  const [renameTarget, setRenameTarget] = useState<{ userId: string; fullName: string } | null>(null)
   const [resetTarget, setResetTarget] = useState<{ userId: string; fullName: string } | null>(null)
   const [roleTarget, setRoleTarget] = useState<{ userId: string; fullName: string; classRole: string } | null>(null)
   const [lockTarget, setLockTarget] = useState<{ userId: string; fullName: string; status: string } | null>(null)
@@ -300,6 +301,9 @@ export function StudentsTab({ classId, isManager, onViewProfile }: { classId: st
                                 <UserCog className="mr-2 h-4 w-4" />
                                 {s.classRole === 'TREASURER' ? 'Gỡ quyền thủ quỹ' : 'Gán làm thủ quỹ'}
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setRenameTarget({ userId: s.userId, fullName: s.fullName })}>
+                                <UserCog className="mr-2 h-4 w-4" /> Đổi tên học sinh
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => setResetTarget({ userId: s.userId, fullName: s.fullName })}>
                                 <KeyRound className="mr-2 h-4 w-4" /> Đặt lại mật khẩu
                               </DropdownMenuItem>
@@ -382,6 +386,13 @@ export function StudentsTab({ classId, isManager, onViewProfile }: { classId: st
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => setRenameTarget({ userId: s.userId, fullName: s.fullName })}
+                      >
+                        Đổi tên
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => setResetTarget({ userId: s.userId, fullName: s.fullName })}
                       >
                         <KeyRound className="h-3.5 w-3.5" />
@@ -450,6 +461,12 @@ export function StudentsTab({ classId, isManager, onViewProfile }: { classId: st
         onClose={() => setImportOpen(false)}
         classId={classId}
         onImported={invalidateAll}
+      />
+      <RenameStudentModal
+        classId={classId}
+        target={renameTarget}
+        onClose={() => setRenameTarget(null)}
+        onRenamed={invalidateAll}
       />
       <ResetPasswordModal
         classId={classId}

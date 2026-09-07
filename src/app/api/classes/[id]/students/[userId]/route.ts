@@ -25,41 +25,64 @@ export async function PATCH(
     if (!member) return fail(404, 'Không tìm thấy thành viên trong lớp.')
 
     const body = await req.json()
-    if (body.classRole === undefined) return fail(400, 'Thiếu dữ liệu classRole.')
-    const newRole = body.classRole === 'TREASURER' ? 'TREASURER' : 'STUDENT'
 
-    if (newRole === member.classRole) {
-      return fail(400, 'Vai trò này đã được gán trước đó.')
-    }
-
-    // Một lớp chỉ nên có một thủ quỹ duy nhất tại một thời điểm
-    if (newRole === 'TREASURER') {
-      await db.classMember.updateMany({
-        where: { classId: id, classRole: 'TREASURER', id: { not: member.id } },
-        data: { classRole: 'STUDENT' },
+    // 1. Update Full Name
+    if (typeof body.fullName === 'string' && body.fullName.trim() !== '') {
+      await db.user.update({
+        where: { id: userId },
+        data: { fullName: body.fullName.trim() },
+      })
+      await logActivity({
+        userId: ctx.user.id,
+        action: 'STUDENT_RENAME',
+        targetType: 'USER',
+        targetId: userId,
+        classId: id,
+        metadata: {
+          oldName: member.user.fullName,
+          newName: body.fullName.trim(),
+          className: ctx.class.name,
+        },
       })
     }
 
-    const updated = await db.classMember.update({
-      where: { id: member.id },
-      data: { classRole: newRole },
-    })
+    // 2. Update Role
+    let updatedMembership = member
+    if (typeof body.classRole === 'string') {
+      const newRole = body.classRole === 'TREASURER' ? 'TREASURER' : 'STUDENT'
 
-    await logActivity({
-      userId: ctx.user.id,
-      action: 'ROLE_CHANGED',
-      targetType: 'CLASS_MEMBER',
-      targetId: member.id,
-      classId: id,
-      metadata: {
-        studentName: member.user.fullName,
-        from: CLASS_ROLE_LABEL[member.classRole],
-        to: CLASS_ROLE_LABEL[newRole],
-        className: ctx.class.name,
-      },
-    })
+      if (newRole !== member.classRole) {
+        // Một lớp chỉ nên có một thủ quỹ duy nhất tại một thời điểm
+        if (newRole === 'TREASURER') {
+          await db.classMember.updateMany({
+            where: { classId: id, classRole: 'TREASURER', id: { not: member.id } },
+            data: { classRole: 'STUDENT' },
+          })
+        }
 
-    return ok({ membership: updated })
+        updatedMembership = await db.classMember.update({
+          where: { id: member.id },
+          data: { classRole: newRole },
+          include: { user: { select: { id: true, fullName: true } } },
+        })
+
+        await logActivity({
+          userId: ctx.user.id,
+          action: 'ROLE_CHANGED',
+          targetType: 'CLASS_MEMBER',
+          targetId: member.id,
+          classId: id,
+          metadata: {
+            studentName: member.user.fullName,
+            from: CLASS_ROLE_LABEL[member.classRole],
+            to: CLASS_ROLE_LABEL[newRole],
+            className: ctx.class.name,
+          },
+        })
+      }
+    }
+
+    return ok({ success: true, member: updatedMembership })
   })
 }
 

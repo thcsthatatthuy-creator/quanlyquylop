@@ -25,12 +25,13 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     })
 
     let csv = '\uFEFF' // BOM for UTF-8 Excel compatibility
-    csv += 'STT,Ho va ten,Email,Mat khau,Vai tro\n'
+    csv += 'STT,Ho va ten,Email,Mat khau,Gioi tinh,Vai tro\n'
 
     members.forEach((m, i) => {
       const roleStr = m.role === 'STUDENT' ? 'Hoc sinh' : m.role === 'TREASURER' ? 'Thu quy' : 'Giao vien'
+      const genderStr = m.user.gender || '—'
       // Passwords are hashed in DB, we cannot export them, so we just write "******"
-      csv += `${i + 1},"${m.user.fullName}","${m.user.email}","****** (Da ma hoa)","${roleStr}"\n`
+      csv += `${i + 1},"${m.user.fullName}","${m.user.email}","****** (Da ma hoa)","${genderStr}","${roleStr}"\n`
     })
 
     return new Response(csv, {

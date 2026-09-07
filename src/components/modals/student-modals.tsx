@@ -252,3 +252,75 @@ export function ResetPasswordModal({
     </Dialog>
   )
 }
+
+export function RenameStudentModal({
+  target,
+  onClose,
+  classId,
+  onRenamed,
+}: {
+  target: { userId: string; fullName: string } | null
+  onClose: () => void
+  classId: string
+  onRenamed: () => void
+}) {
+  const [newName, setNewName] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (target) setNewName(target.fullName)
+  }, [target])
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!target) return
+    if (!newName.trim()) return toast.error('Vui lòng nhập họ tên mới.')
+    setLoading(true)
+    try {
+      await apiFetch(`/api/classes/${classId}/students/${target.userId}`, {
+        method: 'PATCH',
+        json: { fullName: newName.trim() },
+      })
+      toast.success(`Đã đổi tên học sinh thành ${newName.trim()}.`)
+      onRenamed()
+      onClose()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Đổi tên thất bại.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={!!target} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Đổi tên học sinh</DialogTitle>
+          <DialogDescription>
+            Cập nhật họ và tên mới cho học sinh này.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={submit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="new-name">Họ và tên mới</Label>
+            <Input
+              id="new-name"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="Nhập tên mới..."
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Hủy
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Lưu thay đổi
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}

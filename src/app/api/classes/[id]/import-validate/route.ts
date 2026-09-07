@@ -9,6 +9,7 @@ interface ImportRow {
   email: string
   password: string
   role: string
+  gender?: string | null
 }
 
 /**
@@ -50,6 +51,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const password = typeof row.password === 'string' ? row.password.trim() : ''
       const roleRaw = typeof row.role === 'string' ? row.role.trim().toLowerCase() : ''
       const classRole = roleRaw === 'thủ quỹ' || roleRaw === 'thu quy' || roleRaw === 'TREASURER' ? 'TREASURER' : 'STUDENT'
+      let genderRaw = typeof row.gender === 'string' ? row.gender.trim().toLowerCase() : null
+      let gender = null
+      if (genderRaw === 'nam' || genderRaw === 'male') gender = 'Nam'
+      else if (genderRaw === 'nữ' || genderRaw === 'nu' || genderRaw === 'female') gender = 'Nữ'
 
       if (!fullName) errors.push('Thiếu họ tên')
       if (fullName.length > 100) errors.push('Họ tên quá dài')
@@ -57,6 +62,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       else if (!isValidEmail(email)) errors.push('Email không đúng định dạng')
       if (!password) errors.push('Thiếu mật khẩu')
       else if (password.length < 6) errors.push('Mật khẩu phải ≥ 6 ký tự')
+      if (row.gender && !gender) errors.push('Giới tính không hợp lệ (chỉ Nam/Nữ)')
 
       if (email && !errors.includes('Thiếu email')) {
         if (seenInFile.has(email)) errors.push('Email bị trùng trong file')
@@ -71,6 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         email,
         password,
         classRole,
+        gender,
         valid: errors.length === 0,
         errors,
       }

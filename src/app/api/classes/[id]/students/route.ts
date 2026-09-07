@@ -102,7 +102,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const password = typeof body.password === 'string' ? body.password : ''
     const classRole = body.classRole === 'TREASURER' ? 'TREASURER' : 'STUDENT'
     const gender = body.gender === 'female' ? 'Nữ' : (body.gender === 'male' ? 'Nam' : null)
-    const avatar = gender === 'Nữ' ? '/avatars/girl.jpg' : (gender === 'Nam' ? '/avatars/boy.jpg' : null)
+    const { getRandomAvatar } = await import('@/lib/utils')
+    const avatar = getRandomAvatar(gender)
 
     if (!isValidEmail(email)) return fail(400, 'Email không đúng định dạng.')
     if (password.length < 6) return fail(400, 'Mật khẩu phải có ít nhất 6 ký tự.')

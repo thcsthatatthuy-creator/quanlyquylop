@@ -22,6 +22,7 @@ interface PreviewRow {
   email: string
   password: string
   classRole: string
+  gender: string | null
   valid: boolean
   errors: string[]
 }
@@ -80,6 +81,7 @@ export function ImportStudentsModal({
           email: get('Email', 'email'),
           password: get('Mật khẩu', 'Mat khau', 'password'),
           role: get('Role', 'Vai trò', 'Vai tro'),
+          gender: get('Giới tính', 'Gioi tinh', 'Gender'),
         }
       })
 
@@ -107,7 +109,7 @@ export function ImportStudentsModal({
     if (!preview) return
     const validRows = preview
       .filter((r) => r.valid)
-      .map((r) => ({ fullName: r.fullName, email: r.email, password: r.password, classRole: r.classRole }))
+      .map((r) => ({ fullName: r.fullName, email: r.email, password: r.password, classRole: r.classRole, gender: r.gender }))
     if (validRows.length === 0) return toast.error('Không có dòng hợp lệ nào.')
     setImporting(true)
     try {
@@ -128,11 +130,11 @@ export function ImportStudentsModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Import học sinh từ Excel</DialogTitle>
           <DialogDescription>
-            Cột: <b>Họ và tên | Email | Mật khẩu | Role</b> (Role: Học sinh / Thủ quỹ). Bạn sẽ kiểm
+            Cột: <b>Họ và tên | Email | Mật khẩu | Giới tính | Role</b> (Role: Học sinh / Thủ quỹ). Bạn sẽ kiểm
             tra trước khi import.
           </DialogDescription>
         </DialogHeader>
@@ -186,6 +188,7 @@ export function ImportStudentsModal({
                     <th className="px-2 py-2 font-semibold">#</th>
                     <th className="px-2 py-2 font-semibold">Họ tên</th>
                     <th className="px-2 py-2 font-semibold">Email</th>
+                    <th className="px-2 py-2 font-semibold">Giới tính</th>
                     <th className="px-2 py-2 font-semibold">Role</th>
                     <th className="px-2 py-2 font-semibold">Trạng thái</th>
                   </tr>
@@ -196,6 +199,7 @@ export function ImportStudentsModal({
                       <td className="px-2 py-1.5 text-muted-foreground">{r.index + 1}</td>
                       <td className="max-w-[140px] truncate px-2 py-1.5">{r.fullName || '—'}</td>
                       <td className="max-w-[180px] truncate px-2 py-1.5">{r.email || '—'}</td>
+                      <td className="px-2 py-1.5">{r.gender || '—'}</td>
                       <td className="px-2 py-1.5">{r.classRole === 'TREASURER' ? 'Thủ quỹ' : 'Học sinh'}</td>
                       <td className="px-2 py-1.5">
                         {r.valid ? (
